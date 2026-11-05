@@ -123,6 +123,7 @@ table.dct button:disabled{opacity:.3;cursor:not-allowed}
 .dc-legend .k-nr{background:var(--line-strong)}
 .dc-legend .k-as{border-left:2px dashed var(--muted);border-radius:0;width:8px}
 .dc-legend .k-sel{background:var(--accent)}
+.dc-legend .fn{font-size:11px;line-height:1.4;margin-top:2px}
 
 /* Mobile live preview (sticky) */
 .live{display:none}
@@ -248,9 +249,10 @@ footer li{margin-bottom:4px}
         <span><i class="k-step"></i>Recommended progression 10 → 16 → 25 → 35 → 36 → 41 → 44 → 58 (Figure 39)</span>
         <span><i class="k-nr"></i>Not recommended: ON time &gt; OFF time</span>
         <span><i class="k-as"></i>Right of the dashed line (OFF ≤ 0.8 min): not available with AutoStim</span>
-        <span><b class="k r">R</b>Rapid cycling: 21 s/0.8, 14 s/0.8, 7 s/0.3, 7 s/0.2 min (Kostov 2025)</span>
+        <span><b class="k r">R</b>Rapid cycling: 21 s/0.8, 14 s/0.8, 7 s/0.3, 7 s/0.2 min (Kostov 2025)*</span>
         <span><b class="k s">S</b>Saturation cycling: 60 s ON, OFF 5 → 3 → 1.8 → 1.1 min (Kostov 2025; Henning 2025)</span>
         <span><i class="k-sel"></i>Current setting</span>
+        <span class="fn">* R marks only the steps used in NOR-current. Rapid cycling has no single definition: the AAN 2013 guideline defines it as 7 s ON / 30 s OFF (7 s / 0.5 min), and other short-ON combinations right of the dashed line (e.g. 7 s / 0.8, 14 s / 0.5 min) are often called rapid cycling too. All of them are unavailable with AutoStim.</span>
       </div>
     </div>
     <small class="hint" id="dcHint">Click a cell to set ON and OFF time together. Values from manual Table 32 / Figure 39 (ramp included, ≥ 10 Hz).</small>
@@ -364,6 +366,7 @@ footer li{margin-bottom:4px}
     </tbody>
   </table>
   <p class="note">Both raise the duty cycle with time instead of current. Evidence that either beats standard cycling is weak: the AAN 2013 guideline rated rapid vs standard cycling Level U; DeGiorgio 2005 found three duty-cycle paradigms equally effective; in NOR-current, duty cycle was not a significant predictor and response rates did not differ between cycling types. Cells marked R and S in the duty-cycle table set these combinations directly.</p>
+  <p class="note">Note: the R cells and the settings above are the NOR-current steps only, not a definition. The AAN 2013 guideline defines rapid cycling as 7 s ON / 30 s OFF (7 s / 0.5 min, about 30% with ramps), which NOR-current did not list; other short-ON, short-OFF combinations (OFF ≤ 0.8 min) are also commonly called rapid cycling and share the same AutoStim restriction.</p>
 </section>
 </div>
 </div>

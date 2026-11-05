@@ -88,6 +88,50 @@ select{-webkit-appearance:none;appearance:none;width:100%;margin-top:8px;min-hei
   background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
   background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat}
 
+/* Duty-cycle grid picker */
+.dc-btn{-webkit-appearance:none;appearance:none;width:100%;margin-top:8px;min-height:38px;padding:7px 34px 7px 12px;font:inherit;font-size:14px;text-align:left;color:var(--text);background-color:var(--bg);border:1px solid var(--line-strong);border-radius:var(--radius);cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.dc-btn[aria-expanded=true]{border-color:var(--accent)}
+.dc-panel{margin-top:8px;padding:8px 6px 6px;background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--radius)}
+.dc-panel[hidden]{display:none}
+table.dct{width:100%;border-collapse:separate;border-spacing:2px;table-layout:fixed;font-size:11.5px}
+table.dct th,table.dct td{border:0;padding:0;width:auto;text-align:center;vertical-align:middle}
+table.dct th{font-weight:600;color:var(--muted);font-size:10.5px;padding:2px 0}
+table.dct th.cap{font-weight:500;font-size:10px;text-align:left}
+table.dct caption.dc-cap{caption-side:top;text-align:left;font-size:11px;color:var(--muted);padding:0 2px 4px}
+table.dct thead th.off{border-bottom:1px solid var(--line-strong)}
+table.dct td.split{border-left:2px dashed var(--muted)}
+table.dct button{display:block;width:100%;height:26px;padding:0;border:1px solid transparent;border-radius:5px;background:var(--surface);color:var(--text);font:inherit;font-size:11.5px;font-variant-numeric:tabular-nums;cursor:pointer}
+table.dct button:hover{border-color:var(--accent)}
+table.dct button.nr{background:var(--line-strong);color:var(--muted)}
+table.dct button.step{border:1.5px solid var(--accent);border-radius:999px;font-weight:650;color:var(--accent)}
+table.dct button.sel{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+table.dct button:disabled{opacity:.3;cursor:not-allowed}
+.dc-legend{display:grid;gap:3px;margin:8px 2px 2px;font-size:11.5px;color:var(--muted);line-height:1.35}
+.dc-legend i{display:inline-block;width:14px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-2px}
+.dc-legend .k-step{border:1.5px solid var(--accent);border-radius:999px}
+.dc-legend .k-nr{background:var(--line-strong)}
+.dc-legend .k-as{border-left:2px dashed var(--muted);border-radius:0;width:8px}
+.dc-legend .k-sel{background:var(--accent)}
+
+/* Mobile live preview (sticky) */
+.live{display:none}
+@media (max-width:900px){
+  .live{display:flex;position:sticky;top:0;z-index:5;gap:12px;align-items:center;background:var(--bg);border-bottom:1px solid var(--line-strong);padding:8px 0 10px;margin:0 0 16px;box-shadow:0 6px 10px -8px rgba(0,0,0,.25)}
+  .live svg{width:118px;height:118px;flex:none}
+  .live .ld{flex:1;min-width:0;font-size:12.5px;line-height:1.3}
+  .live .lt{font-size:11px;color:var(--muted);margin-bottom:3px}
+  .live .lrow{display:grid;grid-template-columns:14px minmax(0,1fr) 36px;align-items:center;gap:6px;margin:4px 0}
+  .live .lrow span:last-child{text-align:right;font-weight:650}
+  .live .lbar{height:8px;border-radius:4px;background:var(--off);overflow:hidden}
+  .live .lbar i{display:block;height:100%;border-radius:4px}
+  .live .lk{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:6px;color:var(--muted);font-size:12px}
+  .live .lk b{color:var(--text);font-weight:650}
+}
+@media (max-width:560px){
+  .kpi b{font-size:22px;white-space:normal}
+  .kpi b .batt-ic{width:30px;height:17px;margin-right:5px}
+}
+
 /* Results */
 .results{min-width:0}
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 22px}
@@ -160,6 +204,14 @@ footer li{margin-bottom:4px}
 <p class="srckey">Source tags: <span class="src man">Manual</span> LivaNova physician's manual or technical sheet · <span class="src lit">Lit</span> published study · <span class="src mod">Model</span> illustrative assumption made for this page</p>
 </header>
 
+<div class="live" id="live" aria-hidden="true">
+  <svg id="liveNerve" viewBox="0 0 120 120"></svg>
+  <div class="ld">
+    <div class="lt">Live · fibers recruited per pulse (model)</div>
+    <div id="liveBars"></div>
+    <div class="lk" id="liveK"></div>
+  </div>
+</div>
 <div class="layout">
 <details class="panel" open aria-label="Controls">
   <summary><span>Settings</span><span class="chev" aria-hidden="true"></span></summary>
@@ -177,9 +229,18 @@ footer li{margin-bottom:4px}
     <input id="fq" type="range" min="0" max="7" step="1" value="5">
   </div>
   <div class="ctl">
-    <label for="dc">Duty cycle<span class="src man">Manual</span></label>
-    <select id="dc" aria-describedby="dcHint"></select>
-    <small class="hint" id="dcHint">Pick a duty cycle to set ON and OFF time together. Values from manual Table 32 / Figure 39 (ramp included, ≥ 10 Hz).</small>
+    <span class="lbl" id="dcLbl">Duty cycle<span class="src man">Manual</span></span>
+    <button type="button" class="dc-btn" id="dc" aria-expanded="false" aria-controls="dcPanel" aria-describedby="dcLbl"></button>
+    <div class="dc-panel" id="dcPanel" hidden>
+      <table class="dct" id="dcGrid" aria-label="Duty cycle (%) by ON time (rows, seconds) and OFF time (columns, minutes)"></table>
+      <div class="dc-legend">
+        <span><i class="k-step"></i>Recommended progression 10 → 16 → 25 → 35 → 36 → 41 → 44 → 58 (Figure 39)</span>
+        <span><i class="k-nr"></i>Not recommended: ON time &gt; OFF time</span>
+        <span><i class="k-as"></i>Right of the dashed line (OFF ≤ 0.8 min): not available with AutoStim</span>
+        <span><i class="k-sel"></i>Current setting</span>
+      </div>
+    </div>
+    <small class="hint" id="dcHint">Click a cell to set ON and OFF time together. Values from manual Table 32 / Figure 39 (ramp included, ≥ 10 Hz).</small>
   </div>
   <div class="ctl">
     <div class="row"><label for="on">ON time<span class="src man">Manual</span></label><span class="val" id="onV"></span></div>
@@ -291,27 +352,25 @@ const PW=[130,250,500,750,1000], FQ=[1,2,5,10,15,20,25,30], ON=[7,14,21,30,60];
 const OFF=[0.2,0.3,0.5,0.8,1.1,1.8,3,5,10,15,20,25,30,35,40,45,50,55,60,90,120,150,180]; // manual p.65
 const OFF_AS_MIN=4; // index of 1.1 min: with AutoStim on, OFF < 1.1 min is not available (manual p.76)
 // Duty-cycle picker: manual Figure 39 progression and all Table 32 combinations (ramp included).
-const DC_OFF=[0.2,0.3,0.5,0.8,1.1,1.8,3,5,10];
+const DC_OFF=[10,5,3,1.8,1.1,0.8,0.5,0.3,0.2]; // column order as in manual Figure 39
 const DC_STEPS=[[30,5],[30,3],[30,1.8],[30,1.1],[21,0.8],[14,0.5],[7,0.3],[7,0.2]];
 const dcPct=(on,off)=>Math.round((on+4)/(on+off*60)*100);
 function buildDC(){
-  const sel=$('dc'); let h='<option value="custom">Custom (use the sliders)</option>';
-  h+='<optgroup label="Manual phase 2 progression (Figure 39)">';
-  DC_STEPS.forEach(([on,off],i)=>{h+=`<option value="s${i}" data-on="${on}" data-off="${off}">Step ${i+1} · ${dcPct(on,off)}% — ${on} s / ${off} min${off<1.1?' · not with AutoStim':''}</option>`;});
-  h+='</optgroup><optgroup label="All ON / OFF combinations (Table 32)">';
-  const all=[];ON.forEach(on=>DC_OFF.forEach(off=>all.push([on,off])));
-  all.sort((a,b)=>dcPct(...a)-dcPct(...b)||a[0]-b[0]);
-  all.forEach(([on,off])=>{const tags=[];if(on>off*60)tags.push('not recommended: ON > OFF');if(off<1.1)tags.push('not with AutoStim');
-    h+=`<option value="t${on}|${off}" data-on="${on}" data-off="${off}">${dcPct(on,off)}% — ${on} s / ${off} min${tags.length?' · '+tags.join(' · '):''}</option>`;});
-  sel.innerHTML=h+'</optgroup>';
+  let h='<caption class="dc-cap">Rows: ON time (s) · Columns: OFF time (min)</caption><thead><tr><th class="cap" scope="col"><span class="sr">ON time (s)</span></th>'+DC_OFF.map(o=>`<th class="off" scope="col">${o}</th>`).join('')+'</tr></thead><tbody>';
+  ON.forEach(on=>{h+=`<tr><th scope="row">${on}</th>`;
+    DC_OFF.forEach(off=>{const si=DC_STEPS.findIndex(([a,b])=>a===on&&b===off), nr=on>off*60, pct=dcPct(on,off);
+      const lab=`${pct}% duty cycle, ${on} s ON, ${off} min OFF`+(si>=0?`, recommended step ${si+1}`:'')+(nr?', not recommended (ON longer than OFF)':'')+(off<1.1?', not available with AutoStim':'');
+      h+=`<td${off===0.8?' class="split"':''}><button type="button" class="${si>=0?'step':''}${nr?' nr':''}" data-on="${on}" data-off="${off}" title="${lab}" aria-label="${lab}">${pct}</button></td>`;});
+    h+='</tr>';});
+  $('dcGrid').innerHTML=h+'</tbody>';
 }
 function syncDC(asOn){
-  const sel=$('dc'), on=ON[$('on').value], off=OFF[$('off').value];
-  [...sel.querySelectorAll('option[data-off]')].forEach(o=>{o.disabled=asOn&&+o.dataset.off<1.1;});
-  const cur=sel.selectedOptions[0];
-  if(cur&&cur.dataset.on&&+cur.dataset.on===on&&+cur.dataset.off===off)return;
-  const t=sel.querySelector(`option[value="t${on}|${off}"]`);
-  sel.value=t?t.value:'custom';
+  const on=ON[$('on').value], off=OFF[$('off').value];
+  let hit=null;
+  $('dcGrid').querySelectorAll('button').forEach(b=>{b.disabled=asOn&&+b.dataset.off<1.1;
+    const m=+b.dataset.on===on&&+b.dataset.off===off;b.classList.toggle('sel',m);b.setAttribute('aria-pressed',m);if(m)hit=b;});
+  const si=DC_STEPS.findIndex(([a,b])=>a===on&&b===off);
+  $('dc').textContent=hit?`${dcPct(on,off)}% — ${on} s / ${off} min${si>=0?` · step ${si+1}`:''}`:`Custom — ${on} s / ${off} min (not in Table 32)`;
 }
 const $=id=>document.getElementById(id);
 const S={chronic:false};
@@ -416,6 +475,27 @@ function render(){
 
   const nar=narrowMQ.matches;
   drawNerve(delivered,s.pw,nar); drawSD(delivered,s.pw,nar); drawWave(s,ramp,offS,nar);
+  drawLive(delivered,s);
+}
+
+// Mobile live preview: same fiber model and layout as the main cross-section, drawn small.
+const liveMQ=window.matchMedia('(max-width:900px)');
+function drawLive(I,s){
+  if(!liveMQ.matches)return;
+  const pw=s.pw, cx=60, cy=60, R=48; let h='';
+  h+=`<circle cx="${cx}" cy="${cy}" r="${R+6}" fill="none" stroke="var(--line-strong)" stroke-width="1.2"/>`;
+  h+=`<path d="M ${cx-R*0.95} ${cy-R*0.55} A ${R+8} ${R+8} 0 1 1 ${cx-R*0.55} ${cy+R*0.95}" fill="none" stroke="var(--muted)" stroke-width="3" stroke-linecap="round" opacity=".45"/>`;
+  const all=[];
+  for(const g of ['A','B','C']){const n=G[g].n;for(let i=0;i<n;i++)all.push({g,q:(i+0.5)/n});}
+  all.sort((p,q)=>p.q-q.q);
+  all.forEach((f,i)=>{const r=R*Math.sqrt(1-(i+0.5)/all.length)*0.92,a=i*2.39996;
+    const thr=median(f.g,pw)*Math.exp(G[f.g].sig*invPhi(f.q)), on=I>=thr;
+    h+=`<circle cx="${(cx+r*Math.cos(a)).toFixed(1)}" cy="${(cy+r*Math.sin(a)).toFixed(1)}" r="${f.g==='A'?3.2:f.g==='B'?2.2:1.3}" fill="${on?`var(--${f.g.toLowerCase()})`:'var(--off)'}"/>`;});
+  $('liveNerve').innerHTML=h;
+  $('liveBars').innerHTML=['A','B','C'].map(g=>{const v=frac(g,I,pw);
+    return `<div class="lrow"><span>${g}</span><div class="lbar"><i style="width:${(v*100).toFixed(1)}%;background:var(--${g.toLowerCase()})"></i></div><span>${Math.round(v*100)}%</span></div>`;}).join('');
+  $('liveK').innerHTML=`<span><b>${fmtI(s.I)}</b> · ${pw} µs · ${s.f} Hz</span><span>Duty <b>${$('kDuty').textContent}</b></span><span>Battery <b>${$('kBatt').textContent}</b></span>`
+    +(S.chronic?'<span><b>Chronic</b> fibrosis</span>':'');
 }
 
 function drawNerve(I,pw,nar){
@@ -518,15 +598,20 @@ function drawWave(s,ramp,offS,nar){
 }
 
 buildDC();
-$('dc').addEventListener('change',()=>{const o=$('dc').selectedOptions[0];if(!o||!o.dataset.on)return;
-  $('on').value=ON.indexOf(+o.dataset.on);$('off').value=OFF.indexOf(+o.dataset.off);render();});
+const dcOpen=v=>{$('dcPanel').hidden=!v;$('dc').setAttribute('aria-expanded',v);};
+$('dc').addEventListener('click',()=>dcOpen($('dcPanel').hidden));
+$('dcGrid').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
+  $('on').value=ON.indexOf(+b.dataset.on);$('off').value=OFF.indexOf(+b.dataset.off);render();dcOpen(false);$('dc').focus();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('dcPanel').hidden){dcOpen(false);$('dc').focus();}});
+document.addEventListener('click',e=>{if(!$('dcPanel').hidden&&!e.target.closest('#dcPanel,#dc'))dcOpen(false);});
 ['cur','pw','fq','on','off','imp','as'].forEach(id=>$(id).addEventListener('input',render));
 $('acute').onclick=()=>{S.chronic=false;$('acute').setAttribute('aria-pressed','true');$('chronic').setAttribute('aria-pressed','false');render();};
 $('chronic').onclick=()=>{S.chronic=true;$('chronic').setAttribute('aria-pressed','true');$('acute').setAttribute('aria-pressed','false');render();};
 // Manual examples: phase 1 targets by pulse width (p.123) at 20 Hz, 30 s / 5 min; phase 2 duty step 44% (p.124)
 const P={p500:{cur:12,pw:2,fq:5,on:3,off:7},p250:{cur:14,pw:1,fq:5,on:3,off:7},p130:{cur:17,pw:0,fq:5,on:3,off:7},p44:{cur:14,pw:1,fq:5,on:0,off:1}};
 document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=P[b.dataset.p];if(b.dataset.p==='p44')$('as').value='off';$('off').min=0;for(const k in p)$(k).value=p[k];render();});
-if(narrowMQ.addEventListener)narrowMQ.addEventListener('change',render);else if(narrowMQ.addListener)narrowMQ.addListener(render);
+if(narrowMQ.addEventListener)narrowMQ.addEventListener('change',render);
+if(liveMQ.addEventListener)liveMQ.addEventListener('change',render);else if(narrowMQ.addListener)narrowMQ.addListener(render);
 render();
 </script>
 </body>

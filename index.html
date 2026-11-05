@@ -96,6 +96,12 @@ select{-webkit-appearance:none;appearance:none;width:100%;margin-top:8px;min-hei
 .kpi b{display:block;font-size:30px;line-height:1.15;font-weight:650;letter-spacing:-.01em}
 .kpi span{display:block;font-size:13px;color:var(--muted);line-height:1.35;margin-top:4px}
 .kpi b{white-space:nowrap}
+.kpi b span{display:inline;font-size:inherit;color:inherit;line-height:inherit;margin:0}
+.kpi b .batt-ic{display:inline-block;width:40px;height:22px;vertical-align:-1px;margin-right:8px}
+.batt-ic svg{width:100%;height:100%;overflow:visible}
+.batt-ic .shell{fill:none;stroke:currentColor;stroke-width:1.8}
+.batt-ic .tip{fill:currentColor}
+.kpi .battnote{font-size:12px;margin-top:2px}
 .kpi span.src{display:inline-block;font-size:10.5px;line-height:1;margin:0 0 0 6px;vertical-align:1px}
 .kpi span.src.man{color:var(--accent)} .kpi span.src.mod{color:var(--warn-t)}
 @media (max-width:560px){
@@ -171,6 +177,11 @@ footer li{margin-bottom:4px}
     <input id="fq" type="range" min="0" max="7" step="1" value="5">
   </div>
   <div class="ctl">
+    <label for="dc">Duty cycle<span class="src man">Manual</span></label>
+    <select id="dc" aria-describedby="dcHint"></select>
+    <small class="hint" id="dcHint">Pick a duty cycle to set ON and OFF time together. Values from manual Table 32 / Figure 39 (ramp included, ≥ 10 Hz).</small>
+  </div>
+  <div class="ctl">
     <div class="row"><label for="on">ON time<span class="src man">Manual</span></label><span class="val" id="onV"></span></div>
     <input id="on" type="range" min="0" max="4" step="1" value="3">
   </div>
@@ -222,7 +233,7 @@ footer li{margin-bottom:4px}
     <div class="kpi"><b id="kCharge"></b><span>Charge per pulse (nC)<span class="src man">Manual</span></span></div>
     <div class="kpi"><b id="kDuty"></b><span>Duty cycle<span class="src man">Manual</span></span></div>
     <div class="kpi"><b id="kMyel"></b><span>Myelinated fibers recruited<span class="src mod">Model</span></span></div>
-    <div class="kpi"><b id="kBatt"></b><span>Battery to EOS (SenTiva)<span class="src man">Manual</span></span></div>
+    <div class="kpi"><b><span class="batt-ic" id="battIc" aria-hidden="true"></span><span id="kBatt"></span></b><span>Battery to EOS (SenTiva)<span class="src man">Manual</span></span><span class="battnote" id="battNote"></span></div>
   </div>
   <div id="msgs" aria-live="polite"></div>
 </section>
@@ -279,6 +290,29 @@ const CUR=[];for(let i=0;i<=16;i++)CUR.push(+(i*0.125).toFixed(3));for(let v=2.2
 const PW=[130,250,500,750,1000], FQ=[1,2,5,10,15,20,25,30], ON=[7,14,21,30,60];
 const OFF=[0.2,0.3,0.5,0.8,1.1,1.8,3,5,10,15,20,25,30,35,40,45,50,55,60,90,120,150,180]; // manual p.65
 const OFF_AS_MIN=4; // index of 1.1 min: with AutoStim on, OFF < 1.1 min is not available (manual p.76)
+// Duty-cycle picker: manual Figure 39 progression and all Table 32 combinations (ramp included).
+const DC_OFF=[0.2,0.3,0.5,0.8,1.1,1.8,3,5,10];
+const DC_STEPS=[[30,5],[30,3],[30,1.8],[30,1.1],[21,0.8],[14,0.5],[7,0.3],[7,0.2]];
+const dcPct=(on,off)=>Math.round((on+4)/(on+off*60)*100);
+function buildDC(){
+  const sel=$('dc'); let h='<option value="custom">Custom (use the sliders)</option>';
+  h+='<optgroup label="Manual phase 2 progression (Figure 39)">';
+  DC_STEPS.forEach(([on,off],i)=>{h+=`<option value="s${i}" data-on="${on}" data-off="${off}">Step ${i+1} · ${dcPct(on,off)}% — ${on} s / ${off} min${off<1.1?' · not with AutoStim':''}</option>`;});
+  h+='</optgroup><optgroup label="All ON / OFF combinations (Table 32)">';
+  const all=[];ON.forEach(on=>DC_OFF.forEach(off=>all.push([on,off])));
+  all.sort((a,b)=>dcPct(...a)-dcPct(...b)||a[0]-b[0]);
+  all.forEach(([on,off])=>{const tags=[];if(on>off*60)tags.push('not recommended: ON > OFF');if(off<1.1)tags.push('not with AutoStim');
+    h+=`<option value="t${on}|${off}" data-on="${on}" data-off="${off}">${dcPct(on,off)}% — ${on} s / ${off} min${tags.length?' · '+tags.join(' · '):''}</option>`;});
+  sel.innerHTML=h+'</optgroup>';
+}
+function syncDC(asOn){
+  const sel=$('dc'), on=ON[$('on').value], off=OFF[$('off').value];
+  [...sel.querySelectorAll('option[data-off]')].forEach(o=>{o.disabled=asOn&&+o.dataset.off<1.1;});
+  const cur=sel.selectedOptions[0];
+  if(cur&&cur.dataset.on&&+cur.dataset.on===on&&+cur.dataset.off===off)return;
+  const t=sel.querySelector(`option[value="t${on}|${off}"]`);
+  sel.value=t?t.value:'custom';
+}
 const $=id=>document.getElementById(id);
 const S={chronic:false};
 
@@ -333,6 +367,7 @@ function render(){
   offEl.min=asOn?OFF_AS_MIN:0;
   if(asOn&&+offEl.value<OFF_AS_MIN)offEl.value=OFF_AS_MIN;
   $('offHint').textContent=asOn?'With AutoStim on, OFF times below 1.1 min are not available (manual p.76).':'0.2–3 min, then 5–60 min in 5-min steps and 60–180 min in 30-min steps (manual p.65).';
+  syncDC(asOn);
   const s=state();
   setVal('curV',fmtI(s.I)); setVal('pwV',s.pw+' µs'); setVal('fqV',s.f+' Hz');
   setVal('onV',s.on+' s'); setVal('offV',fmtOff(s.off));
@@ -351,6 +386,11 @@ function render(){
   let bt=null; if(BT[key]&&col>=0)bt=BT[key][s.as][col];
   let br=null; if(!bt&&col>=0){const L=[1.5,2,2.5];for(let i=0;i<2;i++){if(s.I>L[i]&&s.I<L[i+1]){const k1=`${L[i]}|${s.f}|${s.pw}`,k2=`${L[i+1]}|${s.f}|${s.pw}`;if(BT[k1]&&BT[k2])br=[L[i],BT[k1][s.as][col],L[i+1],BT[k2][s.as][col]];}}}
   $('kBatt').textContent=bt?bt+' yr':br?`${br[3]}–${br[1]} yr`:'—';
+  { const BEST=13.6, yrs=bt?bt:br?br[3]:null, fr=yrs?Math.min(yrs/BEST,1):0;
+    const col=!yrs?'var(--line-strong)':fr>=0.6?'var(--ok)':fr>=0.3?'var(--warn)':'var(--bad)';
+    $('battIc').style.color=yrs?col:'var(--muted)';
+    $('battIc').innerHTML=`<svg viewBox="0 0 40 22"><rect class="shell" x="1" y="2" width="34" height="18" rx="3.5"/><rect class="tip" x="36" y="8" width="3" height="6" rx="1"/><rect x="4" y="5" width="${(28*fr).toFixed(1)}" height="12" rx="1.5" fill="${col}"/></svg>`;
+    $('battNote').textContent=yrs?`Gauge: share of ${BEST} yr, the longest value in the table`:'Not in the SenTiva table'; }
   const asLabel=$('as').selectedOptions[0].textContent;
   $('batt').innerHTML=bt
    ?`<table><tr><th>Setting</th><td>${fmtI(s.I)}, ${s.f} Hz, ${s.pw} µs, duty ${col?'35%':'10%'}, AutoStim ${asLabel}</td></tr>
@@ -477,6 +517,9 @@ function drawWave(s,ramp,offS,nar){
   svg.innerHTML=h;
 }
 
+buildDC();
+$('dc').addEventListener('change',()=>{const o=$('dc').selectedOptions[0];if(!o||!o.dataset.on)return;
+  $('on').value=ON.indexOf(+o.dataset.on);$('off').value=OFF.indexOf(+o.dataset.off);render();});
 ['cur','pw','fq','on','off','imp','as'].forEach(id=>$(id).addEventListener('input',render));
 $('acute').onclick=()=>{S.chronic=false;$('acute').setAttribute('aria-pressed','true');$('chronic').setAttribute('aria-pressed','false');render();};
 $('chronic').onclick=()=>{S.chronic=true;$('chronic').setAttribute('aria-pressed','true');$('acute').setAttribute('aria-pressed','false');render();};

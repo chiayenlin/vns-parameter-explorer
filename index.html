@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VNS Parameter Explorer</title>
+<meta name="description" content="Interactive teaching tool: how VNS output current, pulse width, frequency and duty cycle affect nerve fiber recruitment, waveform, battery and hardware limits.">
+<style>
+:root{
+  --bg:#fbfaf7; --card:#ffffff; --text:#22211f; --muted:#5f5e5a; --line:#d3d1c7;
+  --accent:#534ab7; --pulse:#d85a30; --pulse-bg:#faece7;
+  --a:#185fa5; --b:#0f6e56; --c:#854f0b; --off:#d3d1c7;
+  --warn-bg:#faeeda; --warn:#633806; --bad-bg:#fcebeb; --bad:#791f1f; --ok-bg:#eaf3de; --ok:#27500a;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1b1b19; --card:#252523; --text:#ecebe6; --muted:#b4b2a9; --line:#444441;
+    --accent:#afa9ec; --pulse:#f0997b; --pulse-bg:#4a1b0c;
+    --a:#85b7eb; --b:#5dcaa5; --c:#ef9f27; --off:#444441;
+    --warn-bg:#412402; --warn:#fac775; --bad-bg:#501313; --bad:#f7c1c1; --ok-bg:#173404; --ok:#c0dd97;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:26px;font-weight:600;margin:0 0 4px}
+h2{font-size:18px;font-weight:600;margin:0 0 12px}
+.sub{color:var(--muted);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:20px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.stack{display:grid;gap:20px}
+.ctl{margin-bottom:14px}
+.ctl label{display:flex;justify-content:space-between;font-weight:600;font-size:14px}
+.ctl label span{font-weight:400;color:var(--muted)}
+.ctl input[type=range],.ctl select{width:100%;margin-top:6px}
+.ctl small{display:block;color:var(--muted);font-size:12px;line-height:1.4;margin-top:4px}
+.seg{display:flex;gap:6px;margin-top:6px}
+.seg button{flex:1;padding:6px;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:8px;cursor:pointer;font-size:13px}
+.seg button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+@media (max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:10px}
+.kpi b{display:block;font-size:22px;font-weight:600}
+.kpi span{font-size:12px;color:var(--muted)}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--text);font-size:12px}
+svg .mut{fill:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.msg{border-radius:8px;padding:8px 10px;font-size:14px;margin:6px 0}
+.msg.ok{background:var(--ok-bg);color:var(--ok)}
+.msg.warn{background:var(--warn-bg);color:var(--warn)}
+.msg.bad{background:var(--bad-bg);color:var(--bad)}
+.note{font-size:13px;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+td,th{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left}
+footer{margin-top:28px;font-size:13px;color:var(--muted)}
+footer ol{padding-left:20px}
+a{color:var(--accent)}
+.sr{position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+<main>
+<h1>VNS Parameter Explorer</h1>
+<p class="sub">How the four programmable parameters of vagus nerve stimulation change fiber recruitment, the delivered waveform, battery life and hardware limits. A teaching illustration based on published studies and the manufacturer's manual — not a programming tool.</p>
+
+<div class="grid">
+<section class="card" aria-label="Controls">
+  <h2>Settings</h2>
+  <div class="ctl">
+    <label for="cur">Output current <span id="curV"></span></label>
+    <input id="cur" type="range" min="0" max="22" step="1" value="12">
+    <small>0–2.0 mA in 0.125 mA steps; 2.0–3.5 mA in 0.25 mA steps (SenTiva).</small>
+  </div>
+  <div class="ctl">
+    <label for="pw">Pulse width <span id="pwV"></span></label>
+    <input id="pw" type="range" min="0" max="4" step="1" value="1">
+  </div>
+  <div class="ctl">
+    <label for="fq">Frequency <span id="fqV"></span></label>
+    <input id="fq" type="range" min="0" max="7" step="1" value="5">
+  </div>
+  <div class="ctl">
+    <label for="on">ON time <span id="onV"></span></label>
+    <input id="on" type="range" min="0" max="4" step="1" value="3">
+  </div>
+  <div class="ctl">
+    <label for="off">OFF time <span id="offV"></span></label>
+    <input id="off" type="range" min="0" max="15" step="1" value="7">
+  </div>
+  <div class="ctl">
+    <label>Electrode–nerve interface</label>
+    <div class="seg" role="group" aria-label="Electrode–nerve interface">
+      <button id="acute" aria-pressed="true">Acute (at implant)</button>
+      <button id="chronic" aria-pressed="false">Chronic (fibrosis)</button>
+    </div>
+    <small>Chronic = 110 µm connective tissue around the electrode, which forms within 4–8 weeks (Helmers 2012).</small>
+  </div>
+  <div class="ctl">
+    <label for="imp">Lead impedance <span id="impV"></span></label>
+    <input id="imp" type="range" min="400" max="9000" step="100" value="3000">
+    <small>Typical at implant 1.5–3 kΩ. High ≥ 5300 Ω; low ≤ 600 Ω (manual).</small>
+  </div>
+  <div class="ctl">
+    <label for="as">AutoStim</label>
+    <select id="as">
+      <option value="off">Off</option>
+      <option value="60-1">On — 60 s, 1 trigger/hour</option>
+      <option value="60-7">On — 60 s, 7 triggers/hour</option>
+      <option value="30-1">On — 30 s, 1 trigger/hour</option>
+      <option value="30-7">On — 30 s, 7 triggers/hour</option>
+    </select>
+  </div>
+  <div class="ctl">
+    <label>Presets</label>
+    <div class="seg">
+      <button data-p="std">Standard 10%</button>
+      <button data-p="rapid">Rapid 44%</button>
+      <button data-p="intol">Intolerant</button>
+    </div>
+  </div>
+</section>
+
+<div class="stack">
+<section class="card" aria-label="Summary">
+  <div class="kpis">
+    <div class="kpi"><b id="kCharge"></b><span>Charge per pulse (nC)</span></div>
+    <div class="kpi"><b id="kDuty"></b><span>Duty cycle</span></div>
+    <div class="kpi"><b id="kMyel"></b><span>Myelinated fibers recruited</span></div>
+    <div class="kpi"><b id="kBatt"></b><span>Battery to EOS (SenTiva)</span></div>
+  </div>
+  <div id="msgs" aria-live="polite"></div>
+</section>
+
+<section class="card" aria-label="Fiber recruitment">
+  <h2>1. Which fibers does each pulse recruit?</h2>
+  <svg id="nerve" viewBox="0 0 680 300" role="img" aria-label="Nerve cross-section with recruited fibers"></svg>
+  <div class="legend">
+    <span><i style="background:var(--a)"></i>A (large myelinated)</span>
+    <span><i style="background:var(--b)"></i>B (small myelinated)</span>
+    <span><i style="background:var(--c)"></i>C (unmyelinated)</span>
+    <span><i style="background:var(--off)"></i>Not recruited</span>
+  </div>
+  <p class="note">Current and pulse width set the charge per pulse and therefore how many fibers reach threshold. Frequency and duty cycle do not change which fibers are recruited by a single pulse — they change how often and for how long. Thresholds follow a strength–duration (Weiss) relation, calibrated only to two anchors from Helmers 2012: about 99% of A/B fibers at 1.5 mA / 500 µs acutely, about 53% with chronic fibrosis. C fibers stay largely unrecruited in the clinical range; they are not required for the antiseizure effect in rats (Krahl 2001).</p>
+</section>
+
+<section class="card" aria-label="Strength-duration">
+  <h2>2. Strength–duration: current needed vs pulse width</h2>
+  <svg id="sd" viewBox="0 0 680 280" role="img" aria-label="Strength-duration curves"></svg>
+  <p class="note">Curves show the current at which half of each fiber group is recruited. Lengthening pulse width lowers the threshold, with diminishing returns beyond about 250 µs; beyond 500 µs extra charge adds little recruitment but drains the battery (Helmers 2012). The manual pairs target currents with pulse width: 1.5 mA at 500 µs, 1.75 mA at 250 µs, 2.25 mA at 130 µs.</p>
+</section>
+
+<section class="card" aria-label="Waveform">
+  <h2>3. What the nerve actually receives</h2>
+  <svg id="wave" viewBox="0 0 680 260" role="img" aria-label="Stimulation waveform"></svg>
+  <p class="note">Top: one second of the ON period — pulse height is current, pulse width is drawn exaggerated, spacing is 1/frequency. Bottom: one full cycle. At ≥ 10 Hz each train has a 2 s ramp-up and 2 s ramp-down, and the manual counts them: duty cycle = (ON + 4 s) ÷ (ON + OFF). Below 10 Hz there is no ramp.</p>
+</section>
+
+<section class="card" aria-label="Battery">
+  <h2>4. Battery cost</h2>
+  <div id="batt"></div>
+  <p class="note">LivaNova SenTiva (Model 1000/1000-D) longevity table, calculated at 3000 Ω lead impedance. Values exist only for 1.5 / 2.0 / 2.5 mA, 20 / 30 Hz, 250 / 500 µs and duty cycle 10% or 35%.</p>
+</section>
+</div>
+</div>
+
+<footer>
+<p><b>Not for clinical programming.</b> This page illustrates published relationships for teaching. Fiber recruitment is a simplified model, not patient-specific; follow the manufacturer's manual and clinical judgment.</p>
+<ol>
+<li>Helmers SL, et al. Application of a computational model of vagus nerve stimulation. Acta Neurol Scand 2012;126:336–343. <a href="https://doi.org/10.1111/j.1600-0404.2012.01656.x">doi</a></li>
+<li>Krahl SE, et al. Destruction of peripheral C-fibers does not alter subsequent VNS-induced seizure suppression in rats. Epilepsia 2001;42:586–589. <a href="https://doi.org/10.1046/j.1528-1157.2001.09700.x">doi</a></li>
+<li>Hulsey DR, et al. Parametric characterization of neural activity in the locus coeruleus in response to VNS. Exp Neurol 2017;289:21–30. <a href="https://doi.org/10.1016/j.expneurol.2016.12.005">doi</a></li>
+<li>Agnew WF, McCreery DB, et al. Histologic and physiologic evaluation of electrically stimulated peripheral nerve. Ann Biomed Eng 1989;17:39–60. <a href="https://doi.org/10.1007/bf02364272">doi</a></li>
+<li>LivaNova. VNS Therapy System Physician's Manual — Epilepsy (US), August 2026, 26-0011-0100/12; and TIS "Impact of SenTiva AutoStim Feature on Battery Longevity".</li>
+<li>Entezami P, et al. High lead impedances requiring revision during VNS generator replacement. Acta Neurochir 2021;163:1365–1368. <a href="https://doi.org/10.1007/s00701-020-04585-2">doi</a></li>
+</ol>
+</footer>
+</main>
+
+<script>
+const CUR=[];for(let i=0;i<=16;i++)CUR.push(+(i*0.125).toFixed(3));for(let v=2.25;v<=3.5001;v+=0.25)CUR.push(+v.toFixed(2));
+const PW=[130,250,500,750,1000], FQ=[1,2,5,10,15,20,25,30], ON=[7,14,21,30,60];
+const OFF=[0.2,0.3,0.5,0.8,1.1,1.8,3,5,10,15,20,30,60,90,120,180];
+const $=id=>document.getElementById(id);
+const S={chronic:false};
+
+// Fiber groups: Weiss strength-duration I = Irh*(1+tau/PW), lognormal spread for distance from electrode.
+const G={
+  A:{tau:120,irh:0.363,sig:0.35,share:0.17,n:12},
+  B:{tau:200,irh:0.50, sig:0.35,share:0.83,n:48},
+  C:{tau:1000,irh:2.0, sig:0.30,share:1,  n:60}
+};
+const FIB=2.2; // chronic fibrosis threshold multiplier, calibrated to ~53% at 1.5 mA/500 us
+function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);
+  const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+function median(g,pw){return G[g].irh*(1+G[g].tau/pw)*(S.chronic?FIB:1);}
+function frac(g,I,pw){if(I<=0)return 0;return Phi(Math.log(I/median(g,pw))/G[g].sig);}
+function invPhi(p){let lo=-6,hi=6;for(let i=0;i<60;i++){const m=(lo+hi)/2;Phi(m)<p?lo=m:hi=m}return (lo+hi)/2;}
+
+// Battery table (TIS): key `${mA}|${Hz}|${us}` -> {off:[10,35], '60-1':[..], '60-7':[..], '30-1':[..], '30-7':[..]}
+const BT={};
+[["1.5|20|250","13.6 6.8 8.5 5.5 7.3 5.1","8.6 5.6 8.2 5.4"],["1.5|20|500","11.1 4.8 7.3 4.1 5.9 3.8","7.5 4.1 6.9 4"],
+ ["1.5|30|250","11.7 5.2 7.5 4.4 6.2 4","7.8 4.4 7.2 4.3"],["1.5|30|500","9.1 3.6 6.3 3.2 4.9 2.8","6.5 3.2 5.9 3"],
+ ["2|20|250","11.4 5 7.5 4.3 6.1 4","7.7 4.3 7.1 4.2"],["2|20|500","8.5 3.3 5.9 2.9 4.5 2.6","6.2 2.9 5.5 2.8"],
+ ["2|30|250","9.7 3.9 6.5 3.4 5.2 3","6.8 3.4 6.2 3.3"],["2|30|500","6.6 2.4 4.8 2.1 3.5 1.8","5.1 2.2 4.5 2.1"],
+ ["2.5|20|250","9.3 3.7 6.4 3.3 5 2.9","6.6 3.3 6 3.2"],["2.5|20|500","6.4 2.2 4.7 2.1 3.4 1.8","5 2.1 4.3 2"],
+ ["2.5|30|250","7.6 2.8 5.4 2.6 4.1 2.3","5.7 2.6 5.1 2.5"],["2.5|30|500","4.9 1.6 3.8 1.5 2.6 1.3","4 1.5 3.4 1.5"]
+].forEach(([k,a,b])=>{const x=a.split(' ').map(Number),y=b.split(' ').map(Number);
+  BT[k]={off:[x[0],x[1]],'60-1':[x[2],x[3]],'60-7':[x[4],x[5]],'30-1':[y[0],y[1]],'30-7':[y[2],y[3]]};});
+
+function state(){return{I:CUR[$('cur').value],pw:PW[$('pw').value],f:FQ[$('fq').value],
+  on:ON[$('on').value],off:OFF[$('off').value],Z:+$('imp').value,as:$('as').value};}
+const fmtI=v=>v.toFixed(v*1000%250?3:2).replace(/0$/,'')+' mA';
+const fmtOff=m=>m<1?`${m} min (${Math.round(m*60)} s)`:`${m} min`;
+
+function render(){
+  const s=state();
+  $('curV').textContent=fmtI(s.I); $('pwV').textContent=s.pw+' µs'; $('fqV').textContent=s.f+' Hz';
+  $('onV').textContent=s.on+' s'; $('offV').textContent=fmtOff(s.off);
+  $('impV').textContent=s.Z+' Ω';
+  const ramp=s.f>=10?4:0, offS=s.off*60, duty=(s.on+ramp)/(s.on+offS)*100;
+  const maxI=12/(s.Z/1000), delivered=Math.min(s.I,maxI);
+  const fa=frac('A',delivered,s.pw), fb=frac('B',delivered,s.pw), fc=frac('C',delivered,s.pw);
+  const myel=G.A.share*fa+G.B.share*fb;
+  $('kCharge').textContent=Math.round(delivered*s.pw);
+  $('kDuty').textContent=duty.toFixed(1)+'%';
+  $('kMyel').textContent=Math.round(myel*100)+'%';
+
+  // battery
+  const key=`${+s.I}|${s.f}|${s.pw}`, col=Math.abs(duty-10.3)<1.5?0:Math.abs(duty-35.4)<1.5?1:-1;
+  let bt=null; if(BT[key]&&col>=0)bt=BT[key][s.as][col];
+  $('kBatt').textContent=bt?bt+' yr':'—';
+  const asLabel=$('as').selectedOptions[0].textContent;
+  $('batt').innerHTML=bt
+   ?`<table><tr><th>Setting</th><td>${fmtI(s.I)}, ${s.f} Hz, ${s.pw} µs, duty ${col?'35%':'10%'}, AutoStim ${asLabel}</td></tr>
+     <tr><th>Estimated years to end of service</th><td><b>${bt}</b></td></tr>
+     <tr><th>Same, AutoStim off, 10% duty</th><td>${BT[key].off[0]}</td></tr></table>`
+   :`<div class="msg warn">This combination is not in the SenTiva table. Try 1.5 / 2.0 / 2.5 mA, 20 or 30 Hz, 250 or 500 µs, and 30 s ON with 5 min OFF (10%) or 1.1 min OFF (35%).</div>`;
+
+  // messages
+  const m=[];
+  if(s.Z>=5300)m.push(['bad',`High lead impedance (≥ 5300 Ω). Not by itself a malfunction; evaluate the lead if the patient cannot feel maximum output and seizures increase. Consider chest and neck X-ray — but a normal X-ray does not exclude fracture.`]);
+  if(s.Z<=600)m.push(['bad','Low lead impedance (≤ 600 Ω) likely indicates a short circuit in the lead.']);
+  if(s.I>maxI+1e-9)m.push(['bad',`Output LOW: the generator can deliver about 12 V ÷ ${s.Z} Ω ≈ ${maxI.toFixed(2)} mA, less than the programmed ${fmtI(s.I)}. Lower the current and widen the pulse width instead; an undeliverable current also drains the battery disproportionately.`]);
+  if(s.on>offS)m.push(['warn','ON time is longer than OFF time — the manual marks these combinations as not recommended (excessive duty cycle has caused nerve damage in animals).']);
+  else if(duty>50)m.push(['warn','Duty cycle above 50%: little evidence of added benefit, higher battery cost, and a smaller safety margin.']);
+  if(s.as!=='off'&&s.off<1.1)m.push(['warn','With AutoStim enabled, OFF time cannot be set below 1.1 min.']);
+  if(s.f<10)m.push(['warn','Below 10 Hz there is no ramp-up/ramp-down; duty cycle counts only the ON time.']);
+  if(s.f<=5)m.push(['warn','Older generators (Models 100–102R): do not use ≤ 5 Hz for long-term stimulation.']);
+  if(s.pw>500)m.push(['warn','Pulse widths beyond 500 µs add charge (and battery drain) with little extra recruitment in the Helmers model.']);
+  if(fc>0.2)m.push(['warn','A meaningful share of C fibers is recruited in this illustration — not needed for the antiseizure effect in rats and a likely source of discomfort.']);
+  if(!m.length)m.push(['ok','No hardware or safety flags for this setting.']);
+  $('msgs').innerHTML=m.map(([c,t])=>`<div class="msg ${c}">${t}</div>`).join('');
+
+  drawNerve(delivered,s.pw); drawSD(delivered,s.pw); drawWave(s,ramp,offS);
+}
+
+function drawNerve(I,pw){
+  const svg=$('nerve'); let h='';
+  const cx=200,cy=150,R=118;
+  h+=`<circle cx="${cx}" cy="${cy}" r="${R+12}" fill="none" stroke="var(--line)" stroke-width="2"/>`;
+  h+=`<path d="M ${cx-R*0.95} ${cy-R*0.55} A ${R+14} ${R+14} 0 1 1 ${cx-R*0.55} ${cy+R*0.95}" fill="none" stroke="var(--muted)" stroke-width="6" stroke-linecap="round" opacity=".55"/>`;
+  h+=`<text x="${cx}" y="18" text-anchor="middle" class="mut">helical electrode (~270° wrap)</text>`;
+  // deterministic fiber layout: golden-angle spiral, threshold multiplier by quantile and distance
+  const all=[];let idx=0;
+  for(const g of ['A','B','C']){const n=G[g].n;for(let i=0;i<n;i++){all.push({g,q:(i+0.5)/n});}}
+  all.sort((p,q)=>p.q-q.q);
+  all.forEach((f,i)=>{
+    const r=R*Math.sqrt(1-(i+0.5)/all.length)*0.92, a=i*2.39996;
+    f.x=cx+r*Math.cos(a); f.y=cy+r*Math.sin(a);
+  });
+  for(const f of all){
+    const thr=median(f.g,pw)*Math.exp(G[f.g].sig*invPhi(f.q));
+    const on=I>=thr, col=on?`var(--${f.g.toLowerCase()})`:'var(--off)';
+    const rad=f.g==='A'?6:f.g==='B'?4:2.4;
+    h+=`<circle cx="${f.x.toFixed(1)}" cy="${f.y.toFixed(1)}" r="${rad}" fill="${col}"/>`;
+  }
+  // bars
+  const bx=400,bw=240; const rows=[['A',frac('A',I,pw)],['B',frac('B',I,pw)],['C',frac('C',I,pw)]];
+  h+=`<text x="${bx}" y="60" class="mut">Share recruited (illustrative)</text>`;
+  rows.forEach(([g,v],k)=>{const y=80+k*60;
+    h+=`<text x="${bx}" y="${y+14}">${g} fibers</text>`;
+    h+=`<rect x="${bx}" y="${y+22}" width="${bw}" height="16" rx="4" fill="var(--off)"/>`;
+    h+=`<rect x="${bx}" y="${y+22}" width="${(bw*v).toFixed(1)}" height="16" rx="4" fill="var(--${g.toLowerCase()})"/>`;
+    h+=`<text x="${bx+bw}" y="${y+14}" text-anchor="end">${Math.round(v*100)}%</text>`;});
+  h+=`<text x="${bx}" y="285" class="mut">${S.chronic?'Chronic: fibrosis raises thresholds ~2.2×':'Acute: electrode on epineurium'}</text>`;
+  svg.innerHTML=h;
+}
+
+function drawSD(I,pw){
+  const svg=$('sd'),X0=60,X1=640,Y0=240,Y1=20,maxI=6,pws=[100,1000];
+  const lx=v=>X0+(Math.log(v)-Math.log(pws[0]))/(Math.log(pws[1])-Math.log(pws[0]))*(X1-X0);
+  const ly=v=>Y0-Math.min(v,maxI)/maxI*(Y0-Y1);
+  let h=`<line x1="${X0}" y1="${Y0}" x2="${X1}" y2="${Y0}" stroke="var(--line)"/><line x1="${X0}" y1="${Y0}" x2="${X0}" y2="${Y1}" stroke="var(--line)"/>`;
+  [130,250,500,750,1000].forEach(p=>{h+=`<line x1="${lx(p)}" y1="${Y0}" x2="${lx(p)}" y2="${Y0+4}" stroke="var(--muted)"/><text x="${lx(p)}" y="${Y0+18}" text-anchor="middle" class="mut">${p}</text>`});
+  [0,1,2,3,4,5,6].forEach(v=>{h+=`<text x="${X0-8}" y="${ly(v)+4}" text-anchor="end" class="mut">${v}</text><line x1="${X0}" y1="${ly(v)}" x2="${X1}" y2="${ly(v)}" stroke="var(--line)" stroke-dasharray="2 4" opacity=".6"/>`});
+  h+=`<text x="${X1}" y="${Y0+34}" text-anchor="end" class="mut">pulse width (µs, log scale)</text><text x="${X0}" y="12" class="mut">mA</text>`;
+  h+=`<rect x="${X0}" y="${ly(3.5)}" width="${X1-X0}" height="${ly(0)-ly(3.5)}" fill="var(--accent)" opacity=".06"/><text x="${X1-4}" y="${ly(3.5)+14}" text-anchor="end" class="mut">device range ≤ 3.5 mA</text>`;
+  for(const g of ['A','B','C']){let d='';for(let p=100;p<=1000;p+=10){const v=median(g,p);if(v>maxI){d='';continue}d+=(d?'L':'M')+lx(p).toFixed(1)+' '+ly(v).toFixed(1)}
+    h+=`<path d="${d}" fill="none" stroke="var(--${g.toLowerCase()})" stroke-width="2.5"/>`;
+    h+=`<text x="${lx(1000)-4}" y="${ly(median(g,1000))-6}" text-anchor="end" style="fill:var(--${g.toLowerCase()})">${g}</text>`;}
+  const cOn=[...Array(91)].map((_,i)=>100+i*10).find(p=>median('C',p)<=maxI);
+  if(cOn)h+=`<text x="${lx(cOn)-6}" y="${Y1+14}" text-anchor="end" style="fill:var(--c)">C fibers: above ${maxI} mA at shorter pulse widths</text>`;
+  else h+=`<text x="${X1}" y="${Y1+14}" text-anchor="end" style="fill:var(--c)">C fibers: above ${maxI} mA (off the chart)</text>`;
+  h+=`<circle cx="${lx(pw)}" cy="${ly(I)}" r="7" fill="var(--pulse)" stroke="var(--card)" stroke-width="2"/>`;
+  h+=`<text x="${lx(pw)+10}" y="${ly(I)-10}">your setting</text>`;
+  svg.innerHTML=h;
+}
+
+function drawWave(s,ramp,offS){
+  const svg=$('wave'); let h='';
+  // top: 1 s window
+  const X0=40,X1=640,base=100,top=30,hI=Math.min(s.I/3.5,1)*(base-top);
+  h+=`<text x="${X0}" y="16" class="mut">1 second during ON — ${s.f} pulses</text>`;
+  h+=`<line x1="${X0}" y1="${base}" x2="${X1}" y2="${base}" stroke="var(--muted)"/>`;
+  const w=Math.max(3,(X1-X0)*Math.min(s.pw/1e6*s.f*8,0.4)/s.f);
+  for(let i=0;i<s.f;i++){const x=X0+(i+0.2)*(X1-X0)/s.f;
+    h+=`<rect x="${x.toFixed(1)}" y="${(base-hI).toFixed(1)}" width="${w.toFixed(1)}" height="${hI.toFixed(1)}" fill="var(--pulse-bg)" stroke="var(--pulse)"/>`;}
+  h+=`<text x="${X1}" y="${base+16}" text-anchor="end" class="mut">pulse width drawn ~8× wider for visibility</text>`;
+  // bottom: cycle
+  const cyc=s.on+offS, Y=225, H=60, sx=v=>X0+v/cyc*(X1-X0);
+  h+=`<text x="${X0}" y="140" class="mut">One cycle: ${s.on} s ON + ${s.off} min OFF</text>`;
+  h+=`<line x1="${X0}" y1="${Y}" x2="${X1}" y2="${Y}" stroke="var(--muted)"/>`;
+  const r=ramp/2, pts=[[0,0],[r,1],[r+s.on,1],[r+s.on+r,0]];
+  const d=pts.map(([t,v],i)=>(i?'L':'M')+sx(t).toFixed(1)+' '+(Y-v*H).toFixed(1)).join(' ')+'Z';
+  h+=`<path d="${d}" fill="var(--pulse-bg)" stroke="var(--pulse)"/>`;
+  const xe=sx(s.on+ramp);
+  h+=`<text x="${Math.min(xe+8,X1-200)}" y="${Y-H+12}">stimulating ${s.on+ramp} s</text>`;
+  h+=`<text x="${Math.max((xe+X1)/2,X0+300)}" y="${Y-12}" text-anchor="middle" class="mut">no stimulation ${Math.round(cyc-s.on-ramp)} s</text>`;
+  h+=`<text x="${X0}" y="${Y+18}" class="mut">${ramp?'2 s ramp-up + ON + 2 s ramp-down (inside the OFF time)':'no ramp below 10 Hz'}</text>`;
+  svg.innerHTML=h;
+}
+
+['cur','pw','fq','on','off','imp','as'].forEach(id=>$(id).addEventListener('input',render));
+$('acute').onclick=()=>{S.chronic=false;$('acute').setAttribute('aria-pressed','true');$('chronic').setAttribute('aria-pressed','false');render();};
+$('chronic').onclick=()=>{S.chronic=true;$('chronic').setAttribute('aria-pressed','true');$('acute').setAttribute('aria-pressed','false');render();};
+const P={std:{cur:12,pw:1,fq:5,on:3,off:7},rapid:{cur:16,pw:1,fq:5,on:0,off:1},intol:{cur:6,pw:0,fq:4,on:3,off:7}};
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=P[b.dataset.p];for(const k in p)$(k).value=p[k];if(b.dataset.p==='rapid')$('as').value='off';render();});
+render();
+</script>
+</body>
+</html>

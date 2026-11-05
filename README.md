@@ -12,6 +12,8 @@ Open `index.html` in any browser. No build step and no external dependencies.
 
 ## Model and sources
 
+Every control, readout and figure carries a source tag: **Manual** (LivaNova physician's manual or technical sheet), **Lit** (published study) or **Model** (an illustrative assumption made for this page). Parameter options, the four example presets (phase 1 targets by pulse width and the phase 2 44% duty-cycle step) and the duty-cycle rules (ON time longer than OFF time not recommended; OFF < 1.1 min unavailable with AutoStim) follow the manual.
+
 - Fiber recruitment uses a Weiss strength–duration relation with a lognormal spread of thresholds. It is calibrated only to two anchors from Helmers et al. 2012 (about 99% of A/B fibers recruited at 1.5 mA / 500 µs acutely; about 53% with 110 µm fibrosis). It is an illustration, not a patient-specific model.
 - Parameter ranges, impedance limits (high ≥ 5300 Ω, low ≤ 600 Ω), the output-current limit, ramp rules and duty-cycle definition follow the LivaNova VNS Therapy Physician's Manual — Epilepsy (US), August 2026.
 - Battery values are from the LivaNova technical information sheet "Impact of SenTiva AutoStim Feature on Battery Longevity" (lead impedance 3000 Ω).

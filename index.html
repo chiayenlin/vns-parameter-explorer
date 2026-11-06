@@ -229,9 +229,17 @@ footer li{margin-bottom:4px}
 <details class="panel" open aria-label="Controls">
   <summary><span>Settings</span><span class="chev" aria-hidden="true"></span></summary>
   <div class="ctl">
+    <label for="dev">Generator<span class="src man">Manual</span></label>
+    <select id="dev">
+      <option value="sentiva">SenTiva (Model 1000)</option>
+      <option value="aspire">AspireSR (Model 106)</option>
+    </select>
+    <small class="hint" id="devHint"></small>
+  </div>
+  <div class="ctl">
     <div class="row"><label for="cur">Output current<span class="src man">Manual</span></label><span class="val" id="curV"></span></div>
     <input id="cur" type="range" min="0" max="22" step="1" value="14">
-    <small class="hint">0–2.0 mA in 0.125 mA steps; 2.0–3.5 mA in 0.25 mA steps (SenTiva).</small>
+    <small class="hint">0–2.0 mA in 0.125 mA steps; 2.0–3.5 mA in 0.25 mA steps (SenTiva and AspireSR, manual p.65).</small>
   </div>
   <div class="ctl">
     <div class="row"><label for="pw">Pulse width<span class="src man">Manual</span></label><span class="val" id="pwV"></span></div>
@@ -317,7 +325,7 @@ footer li{margin-bottom:4px}
   <div class="kpis">
     <div class="kpi"><b id="kCharge"></b><span>Charge per pulse (nC)<span class="src man">Manual</span></span></div>
     <div class="kpi"><b id="kDuty"></b><span>Duty cycle<span class="src man">Manual</span></span></div>
-    <div class="kpi"><b><span class="batt-ic" id="battIc" aria-hidden="true"></span><span id="kBatt"></span></b><span>Battery to EOS (SenTiva)<span class="src man">Manual</span></span><span class="battnote" id="battNote"></span></div>
+    <div class="kpi"><b><span class="batt-ic" id="battIc" aria-hidden="true"></span><span id="kBatt"></span></b><span>Battery to EOS (<span id="kDev">SenTiva</span>)<span class="src man">Manual</span></span><span class="battnote" id="battNote"></span></div>
   </div>
   <div id="msgs" aria-live="polite"></div>
 </section>
@@ -359,7 +367,7 @@ footer li{margin-bottom:4px}
 <section class="fig" aria-label="Battery">
   <h2><span class="n">4</span>Battery cost<span class="src man">Manual</span></h2>
   <div id="batt"></div>
-  <p class="note">LivaNova SenTiva (Model 1000/1000-D) longevity table, calculated at 3000 Ω lead impedance. Values exist only for 1.5 / 2.0 / 2.5 mA, 20 / 30 Hz, 250 / 500 µs and duty cycle 10% or 35%. For a current between two listed values (for example 1.75 mA), the page shows both neighbors as a range and does not interpolate. Battery life also shortens as lead impedance rises above 3000 Ω (manual p.77).</p>
+  <p class="note">Longevity tables from the physician's manual, calculated at 3 kΩ lead impedance: SenTiva Model 1000/1000-D (§10.1, p.163–168) and AspireSR Model 106 (§10.2, p.171–180). Years to end of service = BOL→IFI + IFI→NEOS + NEOS→EOS. With AutoStim on, both generators are tabulated for 0.5–3.5 mA, 20 or 30 Hz, 250 or 500 µs, at 10% (30 s / 5 min) or 35% (30 s / 1.1 min) duty; SenTiva with AutoStim off adds 51% (60 s / 1.1 min). The AspireSR AutoStim-off table covers 10–30 Hz and 130–1000 µs, but only its 10% column is used here: its 33% and 50% columns give no ON/OFF times, and its BOL→IFI column is capped at "&gt;10 years", so low-drain settings show a lower bound. Between two listed currents (for example 1.75 mA) the page shows both neighbors and does not interpolate. Battery life also shortens as lead impedance rises above 3 kΩ (manual p.77).</p>
 </section>
 
 <section class="fig" aria-label="Rapid versus saturation cycling">
@@ -388,7 +396,7 @@ footer li{margin-bottom:4px}
 <li>Krahl SE, et al. Destruction of peripheral C-fibers does not alter subsequent VNS-induced seizure suppression in rats. Epilepsia 2001;42:586–589. <a href="https://doi.org/10.1046/j.1528-1157.2001.09700.x">doi</a></li>
 <li>Hulsey DR, et al. Parametric characterization of neural activity in the locus coeruleus in response to VNS. Exp Neurol 2017;289:21–30. <a href="https://doi.org/10.1016/j.expneurol.2016.12.005">doi</a></li>
 <li>Agnew WF, McCreery DB, et al. Histologic and physiologic evaluation of electrically stimulated peripheral nerve. Ann Biomed Eng 1989;17:39–60. <a href="https://doi.org/10.1007/bf02364272">doi</a></li>
-<li>LivaNova. VNS Therapy System Physician's Manual — Epilepsy (US), August 2026, 26-0011-0100/12; and TIS "Impact of SenTiva AutoStim Feature on Battery Longevity".</li>
+<li>LivaNova. VNS Therapy System Physician's Manual — Epilepsy (US), August 2026, 26-0011-0100/12 (parameters p.65–67; magnet stop time Table 34; battery longevity §10.1–10.2); and TIS "Impact of SenTiva AutoStim Feature on Battery Longevity".</li>
 <li>Entezami P, et al. High lead impedances requiring revision during VNS generator replacement. Acta Neurochir 2021;163:1365–1368. <a href="https://doi.org/10.1007/s00701-020-04585-2">doi</a></li>
 <li>Henning O, et al. Programming in vagus nerve stimulation therapy: consensus from a Nordic Delphi panel. Seizure 2025;131:423–434. <a href="https://doi.org/10.1016/j.seizure.2025.08.014">doi</a></li>
 <li>Kostov KH, et al. Turning up the current — optimizing stimulation parameters with VNS in a nationwide Norwegian cohort (NOR-current). Brain Stimul 2025;18:1212–1219. <a href="https://doi.org/10.1016/j.brs.2025.06.016">doi</a></li>
@@ -449,16 +457,15 @@ function median(g,pw){return G[g].irh*(1+G[g].tau/pw)*(S.chronic?FIB:1);}
 function frac(g,I,pw){if(I<=0)return 0;return Phi(Math.log(I/median(g,pw))/G[g].sig);}
 function invPhi(p){let lo=-6,hi=6;for(let i=0;i<60;i++){const m=(lo+hi)/2;Phi(m)<p?lo=m:hi=m}return (lo+hi)/2;}
 
-// Battery table (TIS): key `${mA}|${Hz}|${us}` -> {off:[10,35], '60-1':[..], '60-7':[..], '30-1':[..], '30-7':[..]}
-const BT={};
-[["1.5|20|250","13.6 6.8 8.5 5.5 7.3 5.1","8.6 5.6 8.2 5.4"],["1.5|20|500","11.1 4.8 7.3 4.1 5.9 3.8","7.5 4.1 6.9 4"],
- ["1.5|30|250","11.7 5.2 7.5 4.4 6.2 4","7.8 4.4 7.2 4.3"],["1.5|30|500","9.1 3.6 6.3 3.2 4.9 2.8","6.5 3.2 5.9 3"],
- ["2|20|250","11.4 5 7.5 4.3 6.1 4","7.7 4.3 7.1 4.2"],["2|20|500","8.5 3.3 5.9 2.9 4.5 2.6","6.2 2.9 5.5 2.8"],
- ["2|30|250","9.7 3.9 6.5 3.4 5.2 3","6.8 3.4 6.2 3.3"],["2|30|500","6.6 2.4 4.8 2.1 3.5 1.8","5.1 2.2 4.5 2.1"],
- ["2.5|20|250","9.3 3.7 6.4 3.3 5 2.9","6.6 3.3 6 3.2"],["2.5|20|500","6.4 2.2 4.7 2.1 3.4 1.8","5 2.1 4.3 2"],
- ["2.5|30|250","7.6 2.8 5.4 2.6 4.1 2.3","5.7 2.6 5.1 2.5"],["2.5|30|500","4.9 1.6 3.8 1.5 2.6 1.3","4 1.5 3.4 1.5"]
-].forEach(([k,a,b])=>{const x=a.split(' ').map(Number),y=b.split(' ').map(Number);
-  BT[k]={off:[x[0],x[1]],'60-1':[x[2],x[3]],'60-7':[x[4],x[5]],'30-1':[y[0],y[1]],'30-7':[y[2],y[3]]};});
+// Battery tables (manual §10.1 SenTiva, §10.2 AspireSR), 3 kΩ, years BOL→EOS.
+// BTD[device][`${mA}|${Hz}|${us}`][cfg] = [10%, 35%, 51% (SenTiva off only)]; ">x" = lower bound (BOL→IFI listed as ">10").
+const BTD={"sentiva":{"0.5|20|250":{"off":[14.3,7.3,5.6],"60-1":[8.7,5.9],"30-1":[9.0,5.9],"60-7":[7.6,5.6],"30-7":[8.4,5.8]},"0.5|20|500":{"off":[14.2,7.2,5.5],"60-1":[8.6,5.8],"30-1":[8.8,5.9],"60-7":[7.5,5.5],"30-7":[8.4,5.7]},"0.5|30|250":{"off":[12.2,5.7,4.3],"60-1":[7.9,4.7],"30-1":[8.1,4.8],"60-7":[6.7,4.4],"30-7":[7.4,4.7]},"0.5|30|500":{"off":[12.1,5.6,4.0],"60-1":[7.9,4.7],"30-1":[8.0,4.7],"60-7":[6.5,4.3],"30-7":[7.4,4.6]},"1|20|250":{"off":[14.1,7.1,5.4],"60-1":[8.6,5.8],"30-1":[8.7,5.8],"60-7":[7.5,5.5],"30-7":[8.3,5.7]},"1|20|500":{"off":[13.9,6.9,5.2],"60-1":[8.5,5.6],"30-1":[8.7,5.8],"60-7":[7.4,5.2],"30-7":[8.3,5.5]},"1|30|250":{"off":[12.0,5.5,3.9],"60-1":[7.8,4.6],"30-1":[8.0,4.7],"60-7":[6.4,4.3],"30-7":[7.3,4.5]},"1|30|500":{"off":[11.9,5.2,3.8],"60-1":[7.6,4.5],"30-1":[7.8,4.6],"60-7":[6.3,4.0],"30-7":[7.3,4.4]},"1.5|20|250":{"off":[13.6,6.8,5.0],"60-1":[8.5,5.5],"30-1":[8.6,5.6],"60-7":[7.3,5.1],"30-7":[8.2,5.4]},"1.5|20|500":{"off":[11.1,4.8,3.5],"60-1":[7.3,4.1],"30-1":[7.5,4.1],"60-7":[5.9,3.8],"30-7":[6.9,4.0]},"1.5|30|250":{"off":[11.7,5.2,3.8],"60-1":[7.5,4.4],"30-1":[7.8,4.4],"60-7":[6.2,4.0],"30-7":[7.2,4.3]},"1.5|30|500":{"off":[9.1,3.6,2.6],"60-1":[6.3,3.2],"30-1":[6.5,3.2],"60-7":[4.9,2.8],"30-7":[5.9,3.0]},"2|20|250":{"off":[11.4,5.0,3.7],"60-1":[7.5,4.3],"30-1":[7.7,4.3],"60-7":[6.1,4.0],"30-7":[7.1,4.2]},"2|20|500":{"off":[8.5,3.3,2.4],"60-1":[5.9,2.9],"30-1":[6.2,2.9],"60-7":[4.5,2.6],"30-7":[5.5,2.8]},"2|30|250":{"off":[9.7,3.9,2.8],"60-1":[6.5,3.4],"30-1":[6.8,3.4],"60-7":[5.2,3.0],"30-7":[6.2,3.3]},"2|30|500":{"off":[6.6,2.4,1.6],"60-1":[4.8,2.1],"30-1":[5.1,2.2],"60-7":[3.5,1.8],"30-7":[4.5,2.1]},"2.5|20|250":{"off":[9.3,3.7,2.7],"60-1":[6.4,3.3],"30-1":[6.6,3.3],"60-7":[5.0,2.9],"30-7":[6.0,3.2]},"2.5|20|500":{"off":[6.4,2.2,1.6],"60-1":[4.7,2.1],"30-1":[5.0,2.1],"60-7":[3.4,1.8],"30-7":[4.3,2.0]},"2.5|30|250":{"off":[7.6,2.8,2.0],"60-1":[5.4,2.6],"30-1":[5.7,2.6],"60-7":[4.1,2.3],"30-7":[5.1,2.5]},"2.5|30|500":{"off":[4.9,1.6,1.2],"60-1":[3.8,1.5],"30-1":[4.0,1.5],"60-7":[2.6,1.3],"30-7":[3.4,1.5]},"3|20|250":{"off":[7.5,2.8,2.0],"60-1":[5.4,2.5],"30-1":[5.6,2.6],"60-7":[4.0,2.2],"30-7":[5.0,2.5]},"3|20|500":{"off":[4.9,1.6,1.2],"60-1":[3.8,1.5],"30-1":[4.0,1.5],"60-7":[2.6,1.4],"30-7":[3.4,1.5]},"3|30|250":{"off":[6.0,2.1,1.4],"60-1":[4.5,1.8],"30-1":[4.7,2.0],"60-7":[3.2,1.7],"30-7":[4.1,1.8]},"3|30|500":{"off":[3.6,1.2,0.9],"60-1":[2.9,1.1],"30-1":[3.0,1.1],"60-7":[1.9,1.0],"30-7":[2.6,1.1]},"3.5|20|250":{"off":[6.1,2.1,1.5],"60-1":[4.5,1.9],"30-1":[4.7,2.0],"60-7":[3.3,1.7],"30-7":[4.1,1.8]},"3.5|20|500":{"off":[3.7,1.2,0.9],"60-1":[2.9,1.2],"30-1":[3.1,1.2],"60-7":[2.0,1.0],"30-7":[2.7,1.1]},"3.5|30|250":{"off":[4.7,1.5,1.1],"60-1":[3.7,1.4],"30-1":[3.8,1.5],"60-7":[2.5,1.3],"30-7":[3.3,1.4]},"3.5|30|500":{"off":[2.7,0.9,0.5],"60-1":[2.2,0.8],"30-1":[2.4,0.9],"60-7":[1.4,0.7],"30-7":[2.0,0.8]}},"aspire":{"0.5|20|250":{"60-1":[11.6,12.0],"30-1":[11.6,12.0],"60-7":[11.7,12.2],"30-7":[11.6,12.1],"off":[">14.7"]},"0.5|20|500":{"60-1":[11.0,10.6],"30-1":[11.0,10.6],"60-7":[10.9,10.5],"30-7":[11.0,10.6],"off":[">14.1"]},"0.5|30|250":{"60-1":[11.1,10.9],"30-1":[11.1,10.9],"60-7":[11.0,10.8],"30-7":[11.1,10.9],"off":[">14.2"]},"0.5|30|500":{"60-1":[10.5,9.3],"30-1":[10.6,9.3],"60-7":[10.2,9.0],"30-7":[10.4,9.2],"off":[">13.6"]},"1|20|250":{"60-1":[11.0,10.6],"30-1":[11.0,10.6],"60-7":[10.9,10.5],"30-7":[11.0,10.6],"off":[">13.9"]},"1|20|500":{"60-1":[10.3,8.5],"30-1":[10.3,8.5],"60-7":[9.6,8.1],"30-7":[10.1,8.4],"off":[">13.0"]},"1|30|250":{"60-1":[10.5,9.2],"30-1":[10.6,9.2],"60-7":[10.2,9.0],"30-7":[10.5,9.2],"off":[">13.4"]},"1|30|500":{"60-1":[9.4,7.1],"30-1":[9.5,7.1],"60-7":[8.6,6.6],"30-7":[9.2,6.9],"off":[">12.5"]},"1.5|20|250":{"60-1":[10.0,8.0],"30-1":[10.1,8.1],"60-7":[9.3,7.7],"30-7":[9.8,7.9],"off":[">12.8"]},"1.5|20|500":{"60-1":[8.6,5.7],"30-1":[8.8,5.7],"60-7":[7.5,5.3],"30-7":[8.3,5.6],"off":[">12.0"]},"1.5|30|250":{"60-1":[9.4,7.0],"30-1":[9.5,7.0],"60-7":[8.5,6.6],"30-7":[9.2,6.9],"off":[">12.4"]},"1.5|30|500":{"60-1":[7.8,4.7],"30-1":[7.9,4.8],"60-7":[6.5,4.4],"30-7":[7.4,4.6],"off":[">11.5"]},"2|20|250":{"60-1":[8.7,5.8],"30-1":[8.8,5.8],"60-7":[7.5,5.3],"30-7":[8.4,5.6],"off":[">12.0"]},"2|20|500":{"60-1":[6.9,3.8],"30-1":[7.0,3.8],"60-7":[5.5,3.4],"30-7":[6.5,3.6],"off":[">11.3"]},"2|30|250":{"60-1":[7.8,4.8],"30-1":[8.1,4.8],"60-7":[6.6,4.4],"30-7":[7.5,4.7],"off":[">11.7"]},"2|30|500":{"60-1":[6.0,2.9],"30-1":[6.2,3.0],"60-7":[4.6,2.7],"30-7":[5.4,2.9],"off":[9.9]},"2.5|20|250":{"60-1":[8.0,4.9],"30-1":[8.2,4.9],"60-7":[6.7,4.5],"30-7":[7.6,4.8],"off":[">11.7"]},"2.5|20|500":{"60-1":[6.1,3.0],"30-1":[6.3,3.1],"60-7":[4.7,2.8],"30-7":[5.6,3.0],"off":[10.3]},"2.5|30|250":{"60-1":[6.9,3.8],"30-1":[7.1,3.9],"60-7":[5.5,3.4],"30-7":[6.6,3.8],"off":[">11.3"]},"2.5|30|500":{"60-1":[5.0,2.2],"30-1":[5.1,2.3],"60-7":[3.7,2.0],"30-7":[4.6,2.2],"off":[7.8]},"3|20|250":{"60-1":[7.1,4.0],"30-1":[7.4,4.1],"60-7":[5.8,3.6],"30-7":[6.8,3.9],"off":[">11.3"]},"3|20|500":{"60-1":[5.1,2.3],"30-1":[5.3,2.4],"60-7":[3.8,2.1],"30-7":[4.8,2.3],"off":[8.1]},"3|30|250":{"60-1":[6.1,3.0],"30-1":[6.3,3.1],"60-7":[4.7,2.8],"30-7":[5.6,3.0],"off":[10.3]},"3|30|500":{"60-1":[4.1,1.8],"30-1":[4.3,1.8],"60-7":[2.9,1.6],"30-7":[3.7,1.7],"off":[5.8]},"3.5|20|250":{"60-1":[6.0,2.9],"30-1":[6.1,2.9],"60-7":[4.5,2.6],"30-7":[5.4,2.8],"off":[9.9]},"3.5|20|500":{"60-1":[3.9,1.7],"30-1":[4.2,1.7],"60-7":[2.8,1.5],"30-7":[3.6,1.6],"off":[5.5]},"3.5|30|250":{"60-1":[4.9,2.2],"30-1":[5.1,2.2],"60-7":[3.6,2.0],"30-7":[4.6,2.2],"off":[7.6]},"3.5|30|500":{"60-1":[3.1,1.2],"30-1":[3.2,1.2],"60-7":[2.1,1.1],"30-7":[2.8,1.2],"off":[4.1]},"0.5|10|130":{"off":[">15.2"]},"0.5|10|250":{"off":[">15.1"]},"0.5|10|500":{"off":[">14.7"]},"0.5|10|750":{"off":[">14.5"]},"0.5|10|1000":{"off":[">14.2"]},"0.5|15|130":{"off":[">15.0"]},"0.5|15|250":{"off":[">14.9"]},"0.5|15|500":{"off":[">14.4"]},"0.5|15|750":{"off":[">14.0"]},"0.5|15|1000":{"off":[">13.7"]},"0.5|20|130":{"off":[">14.9"]},"0.5|20|750":{"off":[">13.7"]},"0.5|20|1000":{"off":[">13.3"]},"0.5|25|130":{"off":[">14.7"]},"0.5|25|250":{"off":[">14.4"]},"0.5|25|500":{"off":[">13.8"]},"0.5|25|750":{"off":[">13.3"]},"0.5|25|1000":{"off":[">13.0"]},"0.5|30|130":{"off":[">14.5"]},"0.5|30|750":{"off":[">13.1"]},"0.5|30|1000":{"off":[">12.8"]},"1|10|130":{"off":[">14.6"]},"1|10|250":{"off":[">14.2"]},"1|10|500":{"off":[">13.7"]},"1|10|750":{"off":[">13.3"]},"1|10|1000":{"off":[">12.9"]},"1|15|130":{"off":[">14.4"]},"1|15|250":{"off":[">14.0"]},"1|15|500":{"off":[">13.3"]},"1|15|750":{"off":[">12.8"]},"1|15|1000":{"off":[">12.5"]},"1|20|130":{"off":[">14.3"]},"1|20|750":{"off":[">12.5"]},"1|20|1000":{"off":[">12.1"]},"1|25|130":{"off":[">14.1"]},"1|25|250":{"off":[">13.6"]},"1|25|500":{"off":[">12.8"]},"1|25|750":{"off":[">12.3"]},"1|25|1000":{"off":[">11.9"]},"1|30|130":{"off":[">14.1"]},"1|30|750":{"off":[">12.0"]},"1|30|1000":{"off":[">11.7"]},"1.5|10|130":{"off":[">13.9"]},"1.5|10|250":{"off":[">13.4"]},"1.5|10|500":{"off":[">12.7"]},"1.5|10|750":{"off":[">12.0"]},"1.5|10|1000":{"off":[">11.7"]},"1.5|15|130":{"off":[">13.7"]},"1.5|15|250":{"off":[">13.1"]},"1.5|15|500":{"off":[">12.2"]},"1.5|15|750":{"off":[">11.7"]},"1.5|15|1000":{"off":[">11.4"]},"1.5|20|130":{"off":[">13.5"]},"1.5|20|750":{"off":[">11.5"]},"1.5|20|1000":{"off":[">11.2"]},"1.5|25|130":{"off":[">13.3"]},"1.5|25|250":{"off":[">12.6"]},"1.5|25|500":{"off":[">11.7"]},"1.5|25|750":{"off":[">11.3"]},"1.5|25|1000":{"off":[10.2]},"1.5|30|130":{"off":[">13.1"]},"1.5|30|750":{"off":[">11.2"]},"1.5|30|1000":{"off":[9.1]},"2|10|130":{"off":[">13.4"]},"2|10|250":{"off":[">12.7"]},"2|10|500":{"off":[">12.0"]},"2|10|750":{"off":[">11.5"]},"2|10|1000":{"off":[">11.2"]},"2|15|130":{"off":[">13.1"]},"2|15|250":{"off":[">12.3"]},"2|15|500":{"off":[">11.5"]},"2|15|750":{"off":[">11.2"]},"2|15|1000":{"off":[9.2]},"2|20|130":{"off":[">12.7"]},"2|20|750":{"off":[9.4]},"2|20|1000":{"off":[7.3]},"2|25|130":{"off":[">12.6"]},"2|25|250":{"off":[">11.8"]},"2|25|500":{"off":[">11.2"]},"2|25|750":{"off":[8.0]},"2|25|1000":{"off":[6.2]},"2|30|130":{"off":[">12.4"]},"2|30|750":{"off":[7.1]},"2|30|1000":{"off":[5.4]},"2.5|10|130":{"off":[">13.1"]},"2.5|10|250":{"off":[">12.4"]},"2.5|10|500":{"off":[">11.6"]},"2.5|10|750":{"off":[">11.2"]},"2.5|10|1000":{"off":[10.1]},"2.5|15|130":{"off":[">12.7"]},"2.5|15|250":{"off":[">12.0"]},"2.5|15|500":{"off":[">11.3"]},"2.5|15|750":{"off":[9.4]},"2.5|15|1000":{"off":[7.4]},"2.5|20|130":{"off":[">12.4"]},"2.5|20|750":{"off":[7.5]},"2.5|20|1000":{"off":[5.8]},"2.5|25|130":{"off":[">12.2"]},"2.5|25|250":{"off":[">11.5"]},"2.5|25|500":{"off":[8.8]},"2.5|25|750":{"off":[6.4]},"2.5|25|1000":{"off":[4.9]},"2.5|30|130":{"off":[">12.0"]},"2.5|30|750":{"off":[5.4]},"2.5|30|1000":{"off":[4.2]},"3|10|130":{"off":[">12.8"]},"3|10|250":{"off":[">12.0"]},"3|10|500":{"off":[">11.3"]},"3|10|750":{"off":[9.6]},"3|10|1000":{"off":[7.5]},"3|15|130":{"off":[">12.4"]},"3|15|250":{"off":[">11.7"]},"3|15|500":{"off":[10.0]},"3|15|750":{"off":[7.1]},"3|15|1000":{"off":[5.5]},"3|20|130":{"off":[">12.0"]},"3|20|750":{"off":[5.6]},"3|20|1000":{"off":[4.4]},"3|25|130":{"off":[">11.9"]},"3|25|250":{"off":[">11.2"]},"3|25|500":{"off":[6.8]},"3|25|750":{"off":[4.8]},"3|25|1000":{"off":[3.6]},"3|30|130":{"off":[">11.7"]},"3|30|750":{"off":[4.1]},"3|30|1000":{"off":[3.1]},"3.5|10|130":{"off":[">12.2"]},"3.5|10|250":{"off":[">11.5"]},"3.5|10|500":{"off":[8.2]},"3.5|10|750":{"off":[5.9]},"3.5|10|1000":{"off":[5.0]},"3.5|15|130":{"off":[">11.9"]},"3.5|15|250":{"off":[">11.2"]},"3.5|15|500":{"off":[6.6]},"3.5|15|750":{"off":[4.7]},"3.5|15|1000":{"off":[3.8]},"3.5|20|130":{"off":[">11.7"]},"3.5|20|750":{"off":[3.9]},"3.5|20|1000":{"off":[3.1]},"3.5|25|130":{"off":[">11.5"]},"3.5|25|250":{"off":[8.5]},"3.5|25|500":{"off":[4.8]},"3.5|25|750":{"off":[3.2]},"3.5|25|1000":{"off":[2.7]},"3.5|30|130":{"off":[">11.3"]},"3.5|30|750":{"off":[2.9]},"3.5|30|1000":{"off":[2.2]}}};
+const DEVNAME={sentiva:'SenTiva',aspire:'AspireSR'};
+const DEVHINT={sentiva:'Programmable ranges are identical to AspireSR (manual p.65). Holding the magnet stops stimulation in 10 s (Table 34). Day-night and scheduled programming available.',
+  aspire:'Programmable ranges are identical to SenTiva (manual p.65). Holding the magnet stops stimulation in 5 s (Table 34). No day-night or scheduled programming (manual p.66–67).'};
+const yrNum=v=>v==null?null:parseFloat(String(v).replace('>',''));
+const DEVBEST={};for(const d in BTD){let m=0;for(const k in BTD[d])for(const c in BTD[d][k])for(const v of BTD[d][k][c]){const n=yrNum(v);if(n>m)m=n;}DEVBEST[d]=m;}
+const BCUR=[0.5,1,1.5,2,2.5,3,3.5];
 
 function state(){return{I:CUR[$('cur').value],pw:PW[$('pw').value],f:FQ[$('fq').value],
   on:ON[$('on').value],off:OFF[$('off').value],Z:+$('imp').value,as:$('as').value};}
@@ -499,24 +506,33 @@ function render(){
   $('kDuty').textContent=duty.toFixed(1)+'%';
 
   // battery
-  const key=`${+s.I}|${s.f}|${s.pw}`, col=Math.abs(duty-10.3)<1.5?0:Math.abs(duty-35.4)<1.5?1:-1;
-  let bt=null; if(BT[key]&&col>=0)bt=BT[key][s.as][col];
-  let br=null; if(!bt&&col>=0){const L=[1.5,2,2.5];for(let i=0;i<2;i++){if(s.I>L[i]&&s.I<L[i+1]){const k1=`${L[i]}|${s.f}|${s.pw}`,k2=`${L[i+1]}|${s.f}|${s.pw}`;if(BT[k1]&&BT[k2])br=[L[i],BT[k1][s.as][col],L[i+1],BT[k2][s.as][col]];}}}
-  $('kBatt').textContent=bt?bt+' yr':br?`${br[3]}–${br[1]} yr`:'—';
-  { const BEST=13.6, yrs=bt?bt:br?br[3]:null, fr=yrs?Math.min(yrs/BEST,1):0;
+  const dev=$('dev').value, BT=BTD[dev], DN=DEVNAME[dev];
+  $('kDev').textContent=DN; $('devHint').textContent=DEVHINT[dev];
+  const key=`${+s.I}|${s.f}|${s.pw}`, col=Math.abs(duty-10.3)<1.5?0:Math.abs(duty-35.4)<1.5?1:Math.abs(duty-50.8)<1.5?2:-1;
+  const cell=(k)=>{const r=BT[k]&&BT[k][s.as];return r&&col>=0&&r[col]!=null?r[col]:null;};
+  let bt=cell(key);
+  let br=null; if(bt==null&&col>=0){for(let i=0;i<BCUR.length-1;i++){if(s.I>BCUR[i]&&s.I<BCUR[i+1]){const k1=`${BCUR[i]}|${s.f}|${s.pw}`,k2=`${BCUR[i+1]}|${s.f}|${s.pw}`,v1=cell(k1),v2=cell(k2);if(v1!=null&&v2!=null)br=[BCUR[i],v1,BCUR[i+1],v2];}}}
+  $('kBatt').textContent=bt!=null?bt+' yr':br?`${br[3]}–${br[1]} yr`:'—';
+  { const BEST=DEVBEST[dev], yrs=bt!=null?yrNum(bt):br?yrNum(br[3]):null, fr=yrs?Math.min(yrs/BEST,1):0;
     const col=!yrs?'var(--line-strong)':fr>=0.6?'var(--ok)':fr>=0.3?'var(--warn)':'var(--bad)';
     $('battIc').style.color=yrs?col:'var(--muted)';
     $('battIc').innerHTML=`<svg viewBox="0 0 40 22"><rect class="shell" x="1" y="2" width="34" height="18" rx="3.5"/><rect class="tip" x="36" y="8" width="3" height="6" rx="1"/><rect x="4" y="5" width="${(28*fr).toFixed(1)}" height="12" rx="1.5" fill="${col}"/></svg>`;
-    $('battNote').textContent=yrs?`Gauge: share of ${BEST} yr, the longest value in the table`:'Not in the SenTiva table'; }
+    $('battNote').textContent=yrs?`Gauge: share of ${BEST} yr, the longest value in the ${DN} table`:`Not in the ${DN} table`; }
   const asLabel=$('as').selectedOptions[0].textContent;
-  $('batt').innerHTML=bt
-   ?`<table><tr><th>Setting</th><td>${fmtI(s.I)}, ${s.f} Hz, ${s.pw} µs, duty ${col?'35%':'10%'}, AutoStim ${asLabel}</td></tr>
+  const dutyLbl=['10%','35%','51%'][col]||'';
+  const lb=v=>String(v).includes('>');
+  const lbRow=(bt!=null&&lb(bt))||(br&&(lb(br[1])||lb(br[3])))?`<tr><th>"&gt;"</th><td>The manual lists BOL→IFI as "&gt;10 years" here, so the total is a lower bound.</td></tr>`:'';
+  const off10=BT[key]&&BT[key].off?BT[key].off[0]:null;
+  $('batt').innerHTML=bt!=null
+   ?`<table><tr><th>Generator</th><td>${DN}</td></tr><tr><th>Setting</th><td>${fmtI(s.I)}, ${s.f} Hz, ${s.pw} µs, duty ${dutyLbl}, AutoStim ${asLabel}</td></tr>
      <tr><th>Estimated years to end of service</th><td><b>${bt}</b></td></tr>
-     <tr><th>Same, AutoStim off, 10% duty</th><td>${BT[key].off[0]}</td></tr></table>`
-   :br?`<table><tr><th>Setting</th><td>${fmtI(s.I)}, ${s.f} Hz, ${s.pw} µs, duty ${col?'35%':'10%'}, AutoStim ${asLabel}</td></tr>
+     ${off10!=null&&!(s.as==='off'&&col===0)?`<tr><th>Same, AutoStim off, 10% duty</th><td>${off10}</td></tr>`:''}${lbRow}</table>`
+   :br?`<table><tr><th>Generator</th><td>${DN}</td></tr><tr><th>Setting</th><td>${fmtI(s.I)}, ${s.f} Hz, ${s.pw} µs, duty ${dutyLbl}, AutoStim ${asLabel}</td></tr>
      <tr><th>Not tabulated — neighbors in the table</th><td><b>${br[3]}–${br[1]}</b> yr</td></tr>
-     <tr><th>${fmtI(br[0])} / ${fmtI(br[2])}</th><td>${br[1]} / ${br[3]} yr (no interpolation)</td></tr></table>`
-   :`<div class="msg warn">This combination is not in the SenTiva table. Try 1.5 / 2.0 / 2.5 mA, 20 or 30 Hz, 250 or 500 µs, and 30 s ON with 5 min OFF (10%) or 1.1 min OFF (35%).</div>`;
+     <tr><th>${fmtI(br[0])} / ${fmtI(br[2])}</th><td>${br[1]} / ${br[3]} yr (no interpolation)</td></tr>${lbRow}</table>`
+   :`<div class="msg warn">${dev==='aspire'
+      ?(s.as==='off'?'Not in the AspireSR table. With AutoStim off, only the 10% column (30 s ON / 5 min OFF) is used; it covers 0.5–3.5 mA, 10–30 Hz and 130–1000 µs.':'Not in the AspireSR table. With AutoStim on: 0.5–3.5 mA in 0.5 mA steps, 20 or 30 Hz, 250 or 500 µs, and 30 s ON with 5 min OFF (10%) or 1.1 min OFF (35%).')
+      :'Not in the SenTiva table. Try 0.5–3.5 mA in 0.5 mA steps, 20 or 30 Hz, 250 or 500 µs, and 30 s ON with 5 min OFF (10%) or 1.1 min OFF (35%); with AutoStim off also 60 s / 1.1 min (51%).'}</div>`;
 
   // messages
   const m=[];
@@ -662,7 +678,7 @@ $('dcGrid').addEventListener('click',e=>{const b=e.target.closest('button');if(!
   $('on').value=ON.indexOf(+b.dataset.on);$('off').value=OFF.indexOf(+b.dataset.off);render();dcOpen(false);$('dc').focus();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('dcPanel').hidden){dcOpen(false);$('dc').focus();}});
 document.addEventListener('click',e=>{if(!$('dcPanel').hidden&&!e.target.closest('#dcPanel,#dc'))dcOpen(false);});
-['cur','pw','fq','on','off','imp','as'].forEach(id=>$(id).addEventListener('input',render));
+['dev','cur','pw','fq','on','off','imp','as'].forEach(id=>$(id).addEventListener('input',render));
 $('acute').onclick=()=>{S.chronic=false;$('acute').setAttribute('aria-pressed','true');$('chronic').setAttribute('aria-pressed','false');render();};
 $('chronic').onclick=()=>{S.chronic=true;$('chronic').setAttribute('aria-pressed','true');$('acute').setAttribute('aria-pressed','false');render();};
 // Manual examples: phase 1 targets by pulse width (p.123) at 20 Hz, 30 s / 5 min; phase 2 duty step 44% (p.124)

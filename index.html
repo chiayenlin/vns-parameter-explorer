@@ -112,6 +112,7 @@ table.dct button.sc::after{content:"S";background:var(--b)}
 .dc-legend b.k.r{background:var(--pulse)} .dc-legend b.k.s{background:var(--b)}
 .cur-cyc{margin:0 0 10px;font-size:14px;font-weight:600}
 table.cmp th{width:26%}
+table.cmp.helm{margin-top:16px}
 table.cmp td{padding-right:12px}
 table.cmp thead th{color:var(--text);font-weight:650;width:auto}
 table.cmp td b{font-size:15px}
@@ -132,7 +133,7 @@ table.dct button:disabled{opacity:.3;cursor:not-allowed}
   .live svg{width:118px;height:118px;flex:none}
   .live .ld{flex:1;min-width:0;font-size:12.5px;line-height:1.3}
   .live .lt{font-size:11px;color:var(--muted);margin-bottom:3px}
-  .live .lrow{display:grid;grid-template-columns:14px minmax(0,1fr) 36px;align-items:center;gap:6px;margin:4px 0}
+  .live .lrow{display:grid;grid-template-columns:14px minmax(0,1fr);align-items:center;gap:6px;margin:4px 0}
   .live .lrow span:last-child{text-align:right;font-weight:650}
   .live .lbar{height:8px;border-radius:4px;background:var(--off);overflow:hidden}
   .live .lbar i{display:block;height:100%;border-radius:4px}
@@ -146,7 +147,7 @@ table.dct button:disabled{opacity:.3;cursor:not-allowed}
 
 /* Results */
 .results{min-width:0}
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 22px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0 0 22px}
 .kpi{padding:2px 18px;border-left:1px solid var(--line)}
 .kpi:first-child{padding-left:0;border-left:0}
 .kpi b{display:block;font-size:30px;line-height:1.15;font-weight:650;letter-spacing:-.01em}
@@ -219,7 +220,7 @@ footer li{margin-bottom:4px}
 <div class="live" id="live" aria-hidden="true">
   <svg id="liveNerve" viewBox="0 0 120 120"></svg>
   <div class="ld">
-    <div class="lt">Live · fibers recruited per pulse (model)</div>
+    <div class="lt">Live · fiber recruitment (illustrative)</div>
     <div id="liveBars"></div>
     <div class="lk" id="liveK"></div>
   </div>
@@ -316,7 +317,6 @@ footer li{margin-bottom:4px}
   <div class="kpis">
     <div class="kpi"><b id="kCharge"></b><span>Charge per pulse (nC)<span class="src man">Manual</span></span></div>
     <div class="kpi"><b id="kDuty"></b><span>Duty cycle<span class="src man">Manual</span></span></div>
-    <div class="kpi"><b id="kMyel"></b><span>Myelinated fibers recruited<span class="src mod">Model</span></span></div>
     <div class="kpi"><b><span class="batt-ic" id="battIc" aria-hidden="true"></span><span id="kBatt"></span></b><span>Battery to EOS (SenTiva)<span class="src man">Manual</span></span><span class="battnote" id="battNote"></span></div>
   </div>
   <div id="msgs" aria-live="polite"></div>
@@ -331,13 +331,23 @@ footer li{margin-bottom:4px}
     <span><i style="background:var(--c)"></i>C (unmyelinated)</span>
     <span><i style="background:var(--off)"></i>Not recruited</span>
   </div>
-  <p class="note">Current and pulse width set the charge per pulse and therefore how many fibers reach threshold. Frequency and duty cycle do not change which fibers are recruited by a single pulse — they change how often and for how long. Thresholds follow a strength–duration (Weiss) relation, calibrated only to two anchors from Helmers 2012: about 99% of A/B fibers at 1.5 mA / 500 µs acutely, about 53% with chronic fibrosis. C fibers stay largely unrecruited in the clinical range; they are not required for the antiseizure effect in rats (Krahl 2001).</p>
+  <p class="note">Current and pulse width set the charge per pulse and therefore how many fibers reach threshold. Frequency and duty cycle do not change which fibers are recruited by a single pulse — they change how often and for how long. The dots and bars are illustrative only: they show the direction of change — more current or longer pulses recruit more fibers, and fibrosis raises the current needed — not how many fibers are recruited. They come from a generic strength–duration (Weiss) sketch whose parameters were chosen for this page, so no percentages are shown. C fibers stay largely unrecruited in the clinical range; they are not required for the antiseizure effect in rats (Krahl 2001).</p>
+  <table class="cmp helm">
+    <thead><tr><th>What Helmers 2012 reported<span class="src lit">Lit</span></th><td><b>Computer model of the human vagus nerve</b></td></tr></thead>
+    <tbody>
+      <tr><th>1.5 mA, 500 µs</th><td>About 99.5% of A/B fibers activated acutely; about 53% with 110 µm fibrosis</td></tr>
+      <tr><th>Chronic model, 0.75 → 1.5 mA</th><td>20% more fibers activated</td></tr>
+      <tr><th>Same current, different pulse width</th><td>130 vs 250 µs about 3% less; 250 → 500 µs 0.7% more; 500 vs 750 µs no difference (current and model not stated)</td></tr>
+      <tr><th>Effective activation</th><td>130 µs needs about 2.25 mA, 250 µs about 1.75 mA (strength–duration fit to registry responders)</td></tr>
+    </tbody>
+  </table>
+  <p class="note">These figures are not fully consistent with one another, and the model was built by authors including manufacturer employees. Use them as orders of magnitude, not as patient-level predictions.</p>
 </section>
 
 <section class="fig" aria-label="Strength-duration">
   <h2><span class="n">2</span>Strength–duration: current needed vs pulse width<span class="src mod">Model</span><span class="src man">Manual targets</span></h2>
   <svg id="sd" viewBox="0 0 680 290" role="img" aria-label="Strength-duration curves"></svg>
-  <p class="note">Curves show the current at which half of each fiber group is recruited. Lengthening pulse width lowers the threshold, with diminishing returns beyond about 250 µs; beyond 500 µs extra charge adds little recruitment but drains the battery (Helmers 2012). The manual pairs target currents with pulse width: 1.5 mA at 500 µs, 1.75 mA at 250 µs, 2.25 mA at 130 µs.</p>
+  <p class="note">Illustrative curves (same sketch as above, not fitted to patient data) showing the current at which about half of each fiber group would be recruited. Lengthening pulse width lowers the threshold, with diminishing returns beyond about 250 µs; beyond 500 µs extra charge adds little recruitment but drains the battery (Helmers 2012). The manual pairs target currents with pulse width: 1.5 mA at 500 µs, 1.75 mA at 250 µs, 2.25 mA at 130 µs.</p>
 </section>
 
 <section class="fig" aria-label="Waveform">
@@ -485,10 +495,8 @@ function render(){
   const ramp=s.f>=10?4:0, offS=s.off*60, duty=(s.on+ramp)/(s.on+offS)*100;
   const maxI=12/(s.Z/1000), delivered=Math.min(s.I,maxI);
   const fa=frac('A',delivered,s.pw), fb=frac('B',delivered,s.pw), fc=frac('C',delivered,s.pw);
-  const myel=G.A.share*fa+G.B.share*fb;
   $('kCharge').textContent=Math.round(delivered*s.pw);
   $('kDuty').textContent=duty.toFixed(1)+'%';
-  $('kMyel').textContent=Math.round(myel*100)+'%';
 
   // battery
   const key=`${+s.I}|${s.f}|${s.pw}`, col=Math.abs(duty-10.3)<1.5?0:Math.abs(duty-35.4)<1.5?1:-1;
@@ -543,7 +551,7 @@ function drawLive(I,s){
     h+=`<circle cx="${(cx+r*Math.cos(a)).toFixed(1)}" cy="${(cy+r*Math.sin(a)).toFixed(1)}" r="${f.g==='A'?3.2:f.g==='B'?2.2:1.3}" fill="${on?`var(--${f.g.toLowerCase()})`:'var(--off)'}"/>`;});
   $('liveNerve').innerHTML=h;
   $('liveBars').innerHTML=['A','B','C'].map(g=>{const v=frac(g,I,pw);
-    return `<div class="lrow"><span>${g}</span><div class="lbar"><i style="width:${(v*100).toFixed(1)}%;background:var(--${g.toLowerCase()})"></i></div><span>${Math.round(v*100)}%</span></div>`;}).join('');
+    return `<div class="lrow"><span>${g}</span><div class="lbar"><i style="width:${(v*100).toFixed(1)}%;background:var(--${g.toLowerCase()})"></i></div></div>`;}).join('');
   $('liveK').innerHTML=`<span><b>${fmtI(s.I)}</b> · ${pw} µs · ${s.f} Hz</span><span>Duty <b>${$('kDuty').textContent}</b></span><span>Battery <b>${$('kBatt').textContent}</b></span>`
     +(S.chronic?'<span><b>Chronic</b> fibrosis</span>':'');
 }
@@ -573,14 +581,14 @@ function drawNerve(I,pw,nar){
   // bars
   const bx=nar?24:370, bw=nar?352:280, y0=nar?318:64, gap=nar?52:62;
   const rows=[['A',frac('A',I,pw)],['B',frac('B',I,pw)],['C',frac('C',I,pw)]];
-  h+=`<text x="${bx}" y="${y0}" class="mut sm">Share recruited (illustrative)</text>`;
+  h+=`<text x="${bx}" y="${y0}" class="mut sm">Relative recruitment (illustrative, no scale)</text>`;
   rows.forEach(([g,v],k)=>{const y=y0+18+k*gap, col=`var(--${g.toLowerCase()})`;
     h+=`<text x="${bx}" y="${y+14}">${g} fibers</text>`;
     h+=`<rect x="${bx}" y="${y+22}" width="${bw}" height="10" rx="5" fill="var(--off)" opacity=".7"/>`;
     if(bw*v>=1)h+=`<rect x="${bx}" y="${y+22}" width="${Math.max(bw*v,10).toFixed(1)}" height="10" rx="5" fill="${col}"/>`;
-    h+=`<text x="${bx+bw}" y="${y+14}" text-anchor="end" class="strong">${Math.round(v*100)}%</text>`;});
+  });
   const sy=y0+18+2*gap+60;
-  h+=`<text x="${bx}" y="${sy}" class="mut sm">${S.chronic?'Chronic: fibrosis raises thresholds ~2.2×':'Acute: electrode on epineurium'}</text>`;
+  h+=`<text x="${bx}" y="${sy}" class="mut sm">${S.chronic?'Chronic: fibrosis raises the current needed':'Acute: electrode on epineurium'}</text>`;
   svg.innerHTML=h;
 }
 

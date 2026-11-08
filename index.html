@@ -147,7 +147,7 @@ table.dct button:disabled{opacity:.3;cursor:not-allowed}
 
 /* Results */
 .results{min-width:0}
-.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0 0 22px}
+.kpis{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1fr) minmax(0,.85fr) minmax(0,1.55fr);gap:0;margin:0 0 22px}
 .kpi{padding:2px 18px;border-left:1px solid var(--line)}
 .kpi:first-child{padding-left:0;border-left:0}
 .kpi b{display:block;font-size:30px;line-height:1.15;font-weight:650;letter-spacing:-.01em}
@@ -159,12 +159,13 @@ table.dct button:disabled{opacity:.3;cursor:not-allowed}
 .batt-ic .shell{fill:none;stroke:currentColor;stroke-width:1.8}
 .batt-ic .tip{fill:currentColor}
 .kpi .battnote{font-size:12px;margin-top:2px}
+.kpi span#kDev{display:inline;margin:0;font-size:inherit;color:inherit}
 .kpi span.src{display:inline-block;font-size:10.5px;line-height:1;margin:0 0 0 6px;vertical-align:1px}
-.kpi span.src.man{color:var(--accent)} .kpi span.src.mod{color:var(--warn-t)}
+.kpi span.src.man{color:var(--accent)} .kpi span.src.mod{color:var(--warn-t)} .kpi span.src.calc{color:var(--muted)}
 @media (max-width:560px){
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px}
   .kpi:nth-child(3){padding-left:0;border-left:0}
-  .kpi b{font-size:26px}
+  .kpi b{font-size:24px;white-space:normal}
 }
 #msgs{display:grid;gap:8px}
 .msg{border-left:3px solid var(--line-strong);padding:3px 0 3px 12px;font-size:14px;line-height:1.5;color:var(--text)}
@@ -324,6 +325,7 @@ footer li{margin-bottom:4px}
 <section aria-label="Summary">
   <div class="kpis">
     <div class="kpi"><b id="kCharge"></b><span>Charge per pulse (nC)<span class="src man">Manual</span></span></div>
+    <div class="kpi"><b id="kDaily"></b><span>Daily charge (mC)<span class="src calc">Calc</span></span><span class="battnote">Excludes ramp, magnet and AutoStim pulses</span></div>
     <div class="kpi"><b id="kDuty"></b><span>Duty cycle<span class="src man">Manual</span></span></div>
     <div class="kpi"><b><span class="batt-ic" id="battIc" aria-hidden="true"></span><span id="kBatt"></span></b><span>Battery to EOS (<span id="kDev">SenTiva</span>)<span class="src man">Manual</span></span><span class="battnote" id="battNote"></span></div>
   </div>
@@ -504,6 +506,9 @@ function render(){
   const fa=frac('A',delivered,s.pw), fb=frac('B',delivered,s.pw), fc=frac('C',delivered,s.pw);
   $('kCharge').textContent=Math.round(delivered*s.pw);
   $('kDuty').textContent=duty.toFixed(1)+'%';
+  // Daily charge = charge per pulse x pulses per ON (plateau) x cycles per day; cycle = ON + OFF as in the manual's duty formula.
+  const dailyMC=delivered*s.pw*s.f*s.on*(86400/(s.on+offS))/1e6;
+  $('kDaily').textContent=dailyMC>=10?Math.round(dailyMC).toString():dailyMC>=1?dailyMC.toFixed(1):Number(dailyMC.toPrecision(2)).toString();
 
   // battery
   const dev=$('dev').value, BT=BTD[dev], DN=DEVNAME[dev];

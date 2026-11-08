@@ -5,8 +5,9 @@ An interactive teaching page showing how the four programmable parameters of vag
 1. which nerve fibers a single pulse recruits (A, B, C fibers; acute vs chronic fibrosis),
 2. the strength–duration relationship between current and pulse width,
 3. the waveform the nerve actually receives (including the 2 s ramps counted in duty cycle),
-4. battery longevity (LivaNova SenTiva or AspireSR tables, selectable), and
-5. hardware and safety limits (lead impedance, output-current limit ≈ 12 V ÷ impedance, ON > OFF warnings).
+4. battery longevity (LivaNova SenTiva or AspireSR tables, selectable),
+5. daily delivered charge (charge per pulse × frequency × ON time × cycles per day, where a cycle is ON + OFF; ramp, magnet and AutoStim pulses are not counted), and
+6. hardware and safety limits (lead impedance, output-current limit ≈ 12 V ÷ impedance, ON > OFF warnings).
 
 Open `index.html` in any browser. No build step and no external dependencies.
 
